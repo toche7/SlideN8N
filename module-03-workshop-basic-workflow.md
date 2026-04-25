@@ -23,7 +23,9 @@ math: katex
 
 <div class="subtitle">Module 3 — เชื่อมต่อข้อมูลและสร้าง Workflow แรก</div>
 
-**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n
+
+ผศ. ดร.ทวีศักดิ์ สมานชื่น
 CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
@@ -58,6 +60,16 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 
 สร้าง Workflow แรกของคุณ
 
+
+---
+## Demo 1: Workflow แรก
+
+<div class="center">
+
+![w:800px](fig/m3_Demo1.png)
+
+</div>
+
 ---
 
 ## Demo 1: Workflow แรก
@@ -76,16 +88,12 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 
 ---
 
-## ผลลัพธ์ที่ควรเห็น
-
-### Output จาก Set Node
+## ผลลัพธ์ที่ควรเห็น: Output จาก Set Node
 
 ```json
 [
   {
-    "json": {
       "message": "Hello Statistics!"
-    }
   }
 ]
 ```
@@ -105,17 +113,23 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 
 เริ่มต้น Workflow ด้วย Triggers
 
+
+---
+## Trigger Nodes
+
+<div class="center">
+
+![w:600px](fig/m3_triggerNode.gif)
+
+</div>
+
 ---
 
-## Schedule Trigger
-
-### รัน Workflow ตามเวลาที่กำหนด
+## Schedule Trigger :  รัน Workflow ตามเวลาที่กำหนด
 
 **การตั้งค่า:**
 - **Mode:** Every X minutes / hours / days
 - **Cron Expression:** สำหรับตั้งเวลาซับซ้อน
-
-**ตัวอย่าง Cron สำหรับงานสถิติ:**
 
 | Cron | ความหมาย |
 |---|---|
@@ -151,6 +165,18 @@ https://your-n8n.domain.go.th/webhook/stats-data
 
 เรียกข้อมูลจาก REST API
 
+
+---
+## HTTP Request พื้นฐาน
+
+### Demo 2: ดึงข้อมูลจาก Open Data API
+
+<div class="center">
+
+![w:700px](fig/m3_Demo2.png)
+
+</div>
+
 ---
 
 ## HTTP Request พื้นฐาน
@@ -172,8 +198,6 @@ Headers: (ว่าง)
 
 ## HTTP Request กับ Query Parameters
 
-### การส่ง Parameters ไปกับ URL
-
 ```
 Method: GET
 URL:    https://api.example.go.th/statistics
@@ -187,10 +211,7 @@ URL:    https://api.example.go.th/statistics
 | `province` | `all` |
 | `format` | `json` |
 
-**URL ที่ได้:**
-```
-https://api.example.go.th/statistics?year=2567&province=all&format=json
-```
+**URL ที่ได้:** https://api.example.go.th/statistics?year=2567&province=all&format=json
 
 ---
 

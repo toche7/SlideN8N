@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: mahidol
+theme: mahidol-purple
 paginate: true
 size: 16:9
 footer: "n8n Workflow Automation | Module 1 — Introduction AI and Workflow Automation | สำนักงานสถิติแห่งชาติ"
@@ -24,6 +24,8 @@ math: katex
 <div class="subtitle">Module 1 — ภาพรวม Workflow Automation สำหรับงานสถิติภาครัฐ</div>
 
 **หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+
+ผศ. ดร.ทวีศักดิ์ สมานชื่น
 CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
@@ -65,7 +67,7 @@ The Rise of AI-Powered Automation
 ### ระบบอัตโนมัติในบริบทงานข้อมูล
 
 - **Manual Process** — มนุษย์ทำงานทุกขั้นตอนด้วยตนเอง
-- **Automation** — ระบบทำงานซ้ำๆ แทนมนุษย์โดยอัตโนมัติ
+- **Automation** — ระบบทำงานซ้ำ ๆ แทนมนุษย์โดยอัตโนมัติ
 - **AI-Powered Automation** — ระบบตัดสินใจและปรับตัวได้ด้วย AI
 
 > "Automation is not about replacing humans — it's about freeing humans to do more meaningful work."
@@ -188,7 +190,7 @@ What is Workflow Automation?
 2. **Action 1:** ดึงข้อมูลจากฐานข้อมูลภาครัฐ (API)
 3. **Action 2:** คำนวณและสรุปสถิติ
 4. **Action 3:** สร้าง Dashboard อัตโนมัติ
-5. **Action 4:** ส่ง Email รายงานให้ผู้บริหาร
+
 
 **ผล:** ประหยัดเวลา 16 ชั่วโมง/เดือน
 
@@ -282,6 +284,13 @@ What is Workflow Automation?
 **ขั้นที่ 2: Design**
 - วาง Workflow ที่ต้องการ
 - กำหนด Trigger, Action, Output
+
+
+
+---
+## Framework การเริ่มต้น Automation (ต่อ)
+
+
 
 **ขั้นที่ 3: Implement & Monitor**
 - สร้าง Workflow ด้วย n8n

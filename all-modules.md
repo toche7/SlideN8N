@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: mahidol
+theme: mahidol-purple
 paginate: true
 size: 16:9
 footer: "n8n Workflow Automation | Module 1 — Introduction AI and Workflow Automation | สำนักงานสถิติแห่งชาติ"
@@ -16,15 +16,15 @@ math: katex
 
 <div class="logo-bar">
   <img src="fig/logos/mahidol.svg" alt="Mahidol University">
-  <img src="fig/logos/logo-bdi.png" alt="BDI">
+  <img src="fig/logos/nso.png" alt="BDI">
 </div>
 
 # Introduction AI and Workflow Automation
 
 <div class="subtitle">Module 1 — ภาพรวม Workflow Automation สำหรับงานสถิติภาครัฐ</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -350,15 +350,15 @@ Summary & What's Next
 
 <div class="logo-bar">
   <img src="fig/logos/mahidol.svg" alt="Mahidol University">
-  <img src="fig/logos/logo-bdi.png" alt="BDI">
+  <img src="fig/logos/nso.png" alt="BDI">
 </div>
 
 # Introduction to n8n
 
 <div class="subtitle">Module 2 — รู้จัก n8n: เครื่องมือ Workflow Automation</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -482,14 +482,14 @@ n8n start
 ┌─────────────────────────────────────┐
 │              n8n Server             │
 │                                     │
-│  ┌─────────┐    ┌───────────────┐  │
-│  │  Editor │    │  Workflow     │  │
-│  │   UI    │───▶│  Engine       │  │
-│  └─────────┘    └───────┬───────┘  │
-│                         │          │
-│  ┌──────────────────────▼───────┐  │
-│  │     Node Execution Layer     │  │
-│  └──────────────────────────────┘  │
+│  ┌─────────┐    ┌───────────────┐   │
+│  │  Editor │    │  Workflow     │   │
+│  │   UI    │──▶│  Engine       │   │
+│  └─────────┘    └───────┬───────┘   │
+│                         │           │
+│  ┌──────────────────────▼───────┐   │
+│  │     Node Execution Layer     │   │
+│  └──────────────────────────────┘   │
 └─────────────────────────────────────┘
            │               │
     External APIs     Local Database
@@ -749,15 +749,15 @@ Summary & What's Next
 
 <div class="logo-bar">
   <img src="fig/logos/mahidol.svg" alt="Mahidol University">
-  <img src="fig/logos/logo-bdi.png" alt="BDI">
+  <img src="fig/logos/nso.png" alt="BDI">
 </div>
 
 # Workshop: สร้าง Workflow พื้นฐานด้วย n8n
 
 <div class="subtitle">Module 3 — เชื่อมต่อข้อมูลและสร้าง Workflow แรก</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -1209,15 +1209,15 @@ Summary & What's Next
 
 <div class="logo-bar">
   <img src="fig/logos/mahidol.svg" alt="Mahidol University">
-  <img src="fig/logos/logo-bdi.png" alt="BDI">
+  <img src="fig/logos/nso.png" alt="BDI">
 </div>
 
 # Workshop: ดึงและประมวลผลข้อมูลสถิติอัตโนมัติ
 
 <div class="subtitle">Module 4 — End-to-End Statistics Data Pipeline</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -1844,8 +1844,8 @@ return [{ json: { total, avg, top5, bottom5, year: 2567 } }];
 
 <div class="subtitle">Module 5 — วิเคราะห์ความคิดเห็นและความพึงพอใจด้วย n8n + AI</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -2172,8 +2172,8 @@ Summary & What's Next
 
 <div class="subtitle">Module 6 — การเข้ารหัสและปกป้องข้อมูลสำคัญใน Workflow</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -2466,8 +2466,8 @@ Summary & What's Next
 
 <div class="subtitle">Module 7 — สร้าง AI Agent และ Agent with Tools บน n8n</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -2793,8 +2793,8 @@ Summary & What's Next
 
 <div class="subtitle">Module 8 — พัฒนา AI Agent สำหรับงานสถิติภาครัฐ (Day 2)</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -3159,8 +3159,8 @@ Summary & What's Next
 
 <div class="subtitle">Module 9 — Deploy AI Agent ระดับ Production สำหรับภาครัฐ</div>
 
-**หลักสูตร** n8n Workflow Automation for Government Statistics
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
 
@@ -3481,7 +3481,7 @@ Summary & What's Next
 
 # ยินดีด้วย! สำเร็จหลักสูตรแล้ว
 
-**n8n Workflow Automation for Government Statistics**
-สถาบัน BDI · มหาวิทยาลัยมหิดล
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ขอบคุณทุกท่านที่เข้าร่วม — นำความรู้ไปพัฒนาหน่วยงานได้เลย 🎓

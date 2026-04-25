@@ -23,7 +23,9 @@ math: katex
 
 <div class="subtitle">Module 2 — รู้จัก n8n: เครื่องมือ Workflow Automation</div>
 
-**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n 
+**หลักสูตร** การสร้างผู้ช่วยอัจฉริยะ (AI Agent) สำหรับงานสถิติภาครัฐด้วย n8n
+
+ผศ. ดร.ทวีศักดิ์ สมานชื่น
 CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
 ---
@@ -53,10 +55,16 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 
 <!-- _class: divider -->
 
+<style scoped>
+.n8n-logo { position: absolute; right: 100px; top: 50%; transform: translateY(-50%); width: 520px; object-fit: contain; }
+</style>
+
 ## 01
 ## n8n คืออะไร?
 
 What is n8n?
+
+<img class="n8n-logo" src="fig/logos/n8n-icon.png.webp" />
 
 ---
 
@@ -64,14 +72,13 @@ What is n8n?
 
 ### n8n — Workflow Automation Platform
 
-- **ชื่อ:** n8n (อ่านว่า "nodemation")
+- **ชื่อ:** n8n (อ่านว่า "n eight n")
 - **ปีที่เริ่มต้น:** 2019 โดย Jan Oberhauser
 - **License:** Fair-code (Source Available)
 - **GitHub:** github.com/n8n-io/n8n
 - **Integrations:** 400+ บริการและ API
 
 ### คำขวัญ
-
 > "Build complex automations 10x faster, without fighting APIs"
 
 ---
@@ -121,6 +128,9 @@ n8n Architecture & Deployment
 
 ### ตัวเลือกการ Deploy
 
+<div class="columns">
+<div>
+
 **Option 1: Docker (แนะนำสำหรับภาครัฐ)**
 ```bash
 docker run -it --rm \
@@ -130,36 +140,30 @@ docker run -it --rm \
   n8nio/n8n
 ```
 
+</div>
+<div>
+
 **Option 2: npm**
 ```bash
 npm install n8n -g
 n8n start
 ```
 
-**Option 3: n8n Cloud** — cloud.n8n.io (ต้องการ Subscription)
+**Option 3: n8n Cloud** (เหมาะกับการเรียน)
+n8n.io (ต้องการ Subscription)
+
+</div>
+</div>
 
 ---
 
 ## สถาปัตยกรรมภายใน
 
-### องค์ประกอบของ n8n
+<div class="center">
 
-```
-┌─────────────────────────────────────┐
-│              n8n Server             │
-│                                     │
-│  ┌─────────┐    ┌───────────────┐  │
-│  │  Editor │    │  Workflow     │  │
-│  │   UI    │───▶│  Engine       │  │
-│  └─────────┘    └───────┬───────┘  │
-│                         │          │
-│  ┌──────────────────────▼───────┐  │
-│  │     Node Execution Layer     │  │
-│  └──────────────────────────────┘  │
-└─────────────────────────────────────┘
-           │               │
-    External APIs     Local Database
-```
+![w:900px](fig/m2_Achitech.png)
+
+</div>
 
 ---
 
@@ -173,6 +177,8 @@ Getting Familiar with n8n UI
 ---
 
 ## ส่วนประกอบหลักของ UI
+<div class="columns">
+<div>
 
 ### หน้า Dashboard หลัก
 
@@ -180,6 +186,8 @@ Getting Familiar with n8n UI
 - 🔑 **Credentials** — จัดการการเชื่อมต่อ API/Service
 - ⚙️ **Settings** — ตั้งค่าระบบ
 - 📊 **Executions** — ประวัติการรัน Workflow
+</div>
+<div>
 
 ### Editor Canvas
 
@@ -187,6 +195,8 @@ Getting Familiar with n8n UI
 - **Canvas** — พื้นที่วาง Workflow (ตรงกลาง)
 - **Node Settings** — ตั้งค่า Node ที่เลือก (ด้านขวา)
 - **Execution Log** — ผลการรัน (ด้านล่าง)
+</div>
+</div>
 
 ---
 
@@ -248,23 +258,12 @@ Getting Familiar with n8n UI
 
 ## Data Transformation Nodes
 
-### จัดการข้อมูลใน n8n
+<div class="center">
 
-```
-Input Data (JSON)
-       │
-       ▼
-┌─────────────┐     ┌───────────────┐
-│  Filter /   │────▶│  Aggregate /  │
-│  If Node    │     │  Summarize    │
-└─────────────┘     └───────────────┘
-       │                    │
-       ▼                    ▼
-┌─────────────┐     ┌───────────────┐
-│  Code Node  │     │  Set Node     │
-│  (JS/Python)│     │  (Transform)  │
-└─────────────┘     └───────────────┘
-```
+![w:600px](fig/m2_datatransform.png)
+
+</div>
+
 
 ---
 
