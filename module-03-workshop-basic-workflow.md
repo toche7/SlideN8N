@@ -215,9 +215,7 @@ URL:    https://api.example.go.th/statistics
 
 ---
 
-## HTTP Request กับ Authentication
-
-### การส่ง API Key
+## HTTP Request กับ Authentication: การส่ง API Key
 
 **ผ่าน Header:**
 ```
@@ -257,49 +255,49 @@ Field: data_source     → {{ $json.source }}
 Field: total_records   → {{ $json.count }}
 ```
 
-### โหมดของ Set Node
-
-- **Keep All Fields** — เก็บข้อมูลเดิม + เพิ่มใหม่
-- **Replace** — แทนที่ด้วยข้อมูลใหม่เท่านั้น
+![bg right:45% contain](fig/m3_Demo3.png)
 
 ---
 
 ## IF Node — เงื่อนไขการทำงาน
 
-### แยก Flow ตามเงื่อนไข
 
 **Demo 4: ตรวจสอบค่าผิดปกติ**
 
 ```
 Condition: {{ $json.value }} > 1000000
 ```
-
 **True Branch** → ส่งแจ้งเตือนว่าข้อมูลสูงผิดปกติ
 **False Branch** → ดำเนินการปกติต่อไป
 
 ### เงื่อนไขที่รองรับ
-
 - Equal / Not Equal
 - Larger / Smaller than
 - Contains / Starts With
-- Is Empty / Is Not Empty
-
+![bg right:45% contain](fig/m3_Demo4.png)
 ---
 
 ## Code Node — เขียน Custom Logic
 
-### JavaScript ใน n8n
+<div class="columns">
+<div>
 
-**Demo 5: คำนวณ % การเปลี่ยนแปลง**
+**Code Node: คำนวณ % การเปลี่ยนแปลง**
 
 ```javascript
 const items = $input.all();
-
 return items.map(item => {
   const current = item.json.current_value;
   const previous = item.json.previous_value;
-  const change = ((current - previous) / previous * 100).toFixed(2);
-  
+  const change = ((current - previous) / 
+                  previous * 100).toFixed(2);
+
+```
+
+</div>
+<div>
+
+```javascript
   return {
     json: {
       ...item.json,
@@ -309,12 +307,15 @@ return items.map(item => {
   };
 });
 ```
+</div>
+</div>
 
 ---
 
 ## Filter / Split in Batches
 
-### จัดการข้อมูลจำนวนมาก
+<div class="columns">
+<div>
 
 **Filter Node** — กรองข้อมูลตามเงื่อนไข
 ```
@@ -325,9 +326,15 @@ return items.map(item => {
 - ป้องกัน API Rate Limit
 - ประมวลผลข้อมูลขนาดใหญ่ได้
 
+</div>
+<div>
+
 **Merge Node** — รวมข้อมูลจากหลาย Branch
 - Merge by Position
 - Merge by Key (JOIN ข้อมูล 2 ชุด)
+
+</div>
+</div>
 
 ---
 
@@ -340,13 +347,32 @@ return items.map(item => {
 
 ---
 
+## Send Mail
+### Demo 5: ส่งรายงานทาง Email
+
+<div class="center">
+
+![w:700px](fig/m3_Demo5.png)
+
+</div>
+
+---
+
 ## ส่งรายงานทาง Email
+
+<div class="columns">
+<div>
 
 ### Send Email Node (SMTP)
 
 **การตั้งค่า Credential:**
 - Protocol: SMTP / Gmail / Outlook
 - Host, Port, Username, Password
+
+**Attachment:** แนบไฟล์ CSV/Excel ได้
+
+</div>
+<div>
 
 **การตั้งค่า Email Node:**
 ```
@@ -356,23 +382,57 @@ Body:    ยอดรวมประจำวันนี้: {{ $json.total }}
          ดูรายละเอียดที่ระบบ Dashboard
 ```
 
-**Attachment:** แนบไฟล์ CSV/Excel ได้
+</div>
+</div>
+
 
 ---
 
-## บันทึกไฟล์ Excel/CSV
+## Google Sheet
+### Demo 6: บันทึกข้อมูลลง Google Sheets
 
-### Write Binary File + Spreadsheet
+<div class="center">
 
-**Demo 6: Export ข้อมูลเป็น Excel**
+![w:700px](fig/m3_Demo6.png)
 
-1. **Spreadsheet File Node** (Write mode)
-   - File Format: XLSX หรือ CSV
-   - ใส่ข้อมูลจาก Input
-2. **Write Binary File Node**
-   - File Path: `/data/reports/report-{{ $today }}.xlsx`
+</div>
 
-> **หมายเหตุ:** ต้อง Mount Volume ใน Docker ให้ถูกต้อง
+---
+
+## บันทึกข้อมูลลง Google Sheets
+
+<div class="columns">
+<div>
+
+### Google Sheets Node
+
+**การตั้งค่า Credential:**
+- Google OAuth2 หรือ Service Account
+- แชร์ Sheet ให้ Service Account Email
+
+**Operation:**
+- **Append** — เพิ่มข้อมูลแถวใหม่
+- **Update** — อัปเดตแถวที่มีอยู่
+- **Read** — ดึงข้อมูลจาก Sheet
+
+</div>
+<div>
+
+**การตั้งค่า Node:**
+```
+Operation:    Append
+Document ID:  (วาง Google Sheet URL)
+Sheet Name:   Sheet1
+
+Columns:
+  date     → {{ $today }}
+  total    → {{ $json.total }}
+  province → {{ $json.province }}
+```
+
+</div>
+</div>
+
 
 ---
 
@@ -389,6 +449,9 @@ Body:    ยอดรวมประจำวันนี้: {{ $json.total }}
 
 ## แบบฝึกหัด 3.1 — รายงานอากาศอัตโนมัติ
 
+<div class="columns">
+<div>
+
 ### โจทย์
 
 สร้าง Workflow ที่:
@@ -397,14 +460,32 @@ Body:    ยอดรวมประจำวันนี้: {{ $json.total }}
 3. **แปลงข้อมูล** — คำนวณค่าเฉลี่ยอุณหภูมิ
 4. **ส่ง Email** สรุปสภาพอากาศประจำวัน
 
+</div>
+<div>
+
 ### API ที่ใช้
 
 ```
 URL: https://api.open-meteo.com/v1/forecast
-Parameters: latitude=13.75, longitude=100.52
-            daily=temperature_2m_max,temperature_2m_min
-            timezone=Asia/Bangkok
+Parameters:
+  latitude=13.75
+  longitude=100.52
+  daily=temperature_2m_max,
+        temperature_2m_min
+  timezone=Asia/Bangkok
 ```
+
+</div>
+</div>
+
+---
+## Hint Workflow Exercise 3.1
+
+<div class="center">
+
+![w:900px](fig/m3_ex1.png)
+
+</div>
 
 ---
 
@@ -412,43 +493,41 @@ Parameters: latitude=13.75, longitude=100.52
 
 ## แบบฝึกหัด 3.2 — Data Cleaning Pipeline
 
+<div class="columns">
+<div>
+
 ### โจทย์
 
 สร้าง Workflow ที่:
 1. **รับข้อมูล** จาก Webhook (จำลองการส่งข้อมูลสำรวจ)
 2. **ตรวจสอบ** ว่าข้อมูลครบถ้วน (ไม่มีค่า null)
-3. **กรอง** เฉพาะข้อมูลที่ผ่านการตรวจสอบ
+3. **แยก** ข้อมูล valid / invalid ออกจากกัน
 4. **บันทึก** ลงไฟล์ CSV แยก: `valid.csv` และ `invalid.csv`
+
+</div>
+<div>
 
 ### สิ่งที่ต้องทำ
 
 1. สร้าง Webhook Trigger
 2. ใช้ IF Node ตรวจสอบ required fields
-3. ใช้ Merge Node รวมผลลัพธ์
-4. Export ด้วย Spreadsheet File Node
+3. True Branch → Export `valid.csv` ด้วย Spreadsheet File Node
+4. False Branch → Export `invalid.csv` ด้วย Spreadsheet File Node
 
 > **Dataset:** ทดสอบด้วย Postman หรือ curl
 
+</div>
+</div>
+
+
 ---
+## Hint Workflow Exercise 3.2
 
-## เฉลย: โครงสร้าง Workflow 3.1
+<div class="center">
 
-```
-[Schedule Trigger]
-       │ ทุกวัน 07:00
-       ▼
-[HTTP Request]
-       │ GET Open-Meteo API
-       ▼
-[Code Node]
-       │ คำนวณค่าเฉลี่ยอุณหภูมิ
-       ▼
-[Set Node]
-       │ จัดรูปแบบข้อความ Email
-       ▼
-[Send Email]
-         ส่งรายงานอากาศ
-```
+![w:900px](fig/m3_ex2.png)
+
+</div>
 
 ---
 
