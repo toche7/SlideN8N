@@ -284,6 +284,9 @@ Getting Familiar with n8n UI
 - n8n เข้ารหัส Credentials ด้วย AES-256
 - สร้างครั้งเดียว ใช้ได้กับ Workflow ทุกอัน
 
+---
+
+## Credentials คืออะไร? (ต่อ)
 ### ประเภท Authentication ที่รองรับ
 
 | ประเภท | ตัวอย่าง |
@@ -334,6 +337,9 @@ How Data Flows Through n8n
   "binary": {}
 }
 ```
+
+---
+## โครงสร้างข้อมูลใน n8n (ต่อ)
 
 - ข้อมูลไหลเป็น **Array of Items**
 - แต่ละ Item มี `json` และ `binary` property
