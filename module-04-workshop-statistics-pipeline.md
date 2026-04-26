@@ -588,13 +588,5 @@ GET https://catalog.nso.go.th/api/3/action/datastore_search
 - ✅ **Excel Report + Email** ส่งรายงานอัตโนมัติ
 - ✅ **Security Best Practices** สำหรับภาครัฐ
 
----
 
-<!-- _class: lead -->
-
-# ยินดีด้วย! 🎉
-
-## จบหลักสูตร n8n Workflow Automation
-
-คุณพร้อมแล้วที่จะนำ Automation ไปใช้ในงานสถิติภาครัฐ
 

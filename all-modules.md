@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: mahidol-purple
+theme: mahidol
 paginate: true
 size: 16:9
 footer: "n8n Workflow Automation | Module 1 — Introduction AI and Workflow Automation | สำนักงานสถิติแห่งชาติ"
@@ -1889,15 +1889,6 @@ GET https://catalog.nso.go.th/api/3/action/datastore_search
 - ✅ **Excel Report + Email** ส่งรายงานอัตโนมัติ
 - ✅ **Security Best Practices** สำหรับภาครัฐ
 
----
-
-<!-- _class: lead -->
-
-# ยินดีด้วย! 🎉
-
-## จบหลักสูตร n8n Workflow Automation
-
-คุณพร้อมแล้วที่จะนำ Automation ไปใช้ในงานสถิติภาครัฐ
 
 
 ---
@@ -1993,24 +1984,26 @@ Text Analysis for Government Services
 ```
 
 ---
-## Prompt Template — Sentiment Analysis
-
-> **System Message:**
-> คุณเป็นผู้เชี่ยวชาญวิเคราะห์ความคิดเห็นภาษาไทย ตอบเฉพาะในรูปแบบ JSON เท่านั้น  
+## Prompt Engineering: Prompt Template 
+> **System Message:** คุณเป็นผู้เชี่ยวชาญวิเคราะห์ความคิดเห็นภาษาไทย ตอบเฉพาะในรูปแบบ JSON เท่านั้น  
 > รูปแบบ: `{ "sentiment": "positive|neutral|negative", "score": 1-10, "summary": "สรุปสั้นๆ", "category": "หมวดหมู่" }`
 
-> **User:** _(ส่ง feedback ของผู้ใช้บริการ)_
-> `วิเคราะห์ความคิดเห็นนี้: "เจ้าหน้าที่ใจดีมาก แต่ต้องรอนานกว่า 2 ชั่วโมง"`
+> **User:**  `วิเคราะห์ความคิดเห็นนี้: "เจ้าหน้าที่ใจดีมาก แต่ต้องรอนานกว่า 2 ชั่วโมง"`
 
-> **AI:** _(LLM ตอบกลับในรูปแบบ JSON)_
-> ```json
+> **AI:** 
+>  ```json
 > { "sentiment": "neutral", "score": 5,
 >   "summary": "พนักงานบริการดี แต่มีปัญหาเรื่องเวลารอ",
 >   "category": "เวลารอ / ขั้นตอน" }
-> ```
 
-> **User:** _(ส่ง feedback ถัดไปในรูปแบบเดียวกัน — ใช้ใน Loop/Batch)_
-> `วิเคราะห์ความคิดเห็นนี้: "ระบบออนไลน์ใช้งานง่าย สะดวกมาก"`
+
+---
+## Prompt Engineering
+### หลักการ Prompt ที่ดี
+- กำหนด Role ชัดเจน
+- ระบุ Output Format (JSON)
+- ให้ตัวอย่าง (Few-shot) ถ้าจำเป็น
+
 
 ---
 
@@ -2038,10 +2031,6 @@ Text Analysis for Government Services
 }
 ```
 
-### หลักการ Prompt ที่ดี
-- กำหนด Role ชัดเจน
-- ระบุ Output Format (JSON)
-- ให้ตัวอย่าง (Few-shot) ถ้าจำเป็น
 
 ---
 
@@ -2065,25 +2054,6 @@ Text Analysis for Government Services
 </div>
 
 
-
----
-
-## ขั้นตอน Workshop A — Step by Step
-
-### Step 1–3: ตั้งค่า Input
-
-1. **Webhook Node** — รับ POST request ที่มี field `feedback`
-2. **Set Node** — สร้าง Prompt จาก `{{ $json.body.feedback }}`
-3. **AI/LLM Node** — เชื่อมต่อ OpenAI `gpt-4o-mini` พร้อม Prompt
-
-### Step 4–6: ประมวลผลและบันทึก
-
-4. **Code Node** — Parse JSON จาก LLM response
-5. **Google Sheets Node** — เพิ่มแถวใหม่ด้วย sentiment, score, summary
-6. **Respond to Webhook** — ส่ง JSON response กลับ
-
-> **ทดสอบ:** ส่ง POST request จาก Postman หรือ n8n Test Webhook
-
 ---
 
 ## ตัวอย่างผลลัพธ์ Workshop A
@@ -2102,7 +2072,12 @@ Text Analysis for Government Services
 }
 ```
 
+---
+## ตัวอย่างผลลัพธ์ Workshop A (ต่อ) 
+
 **บันทึกลง Google Sheets** → คอลัมน์: วันที่, ข้อความ, Sentiment, Score, Summary, Category
+
+> Note: Score ที่ได้จากการทำงานของ LLM ไม่ได้เป็นผลการคำนวณแต่เป็นการประมาณค่าของ LLM ต้องระมัดระวังในการนำไปใช้งาน
 
 ---
 
@@ -2117,10 +2092,8 @@ Text Analysis for Government Services
 
 ## Workshop B: Satisfaction Analysis Pipeline
 
-### เป้าหมาย
-
-ประมวลผล Dummy Data แบบสำรวจความพึงพอใจ 100 ชุด แบบ Batch อัตโนมัติ
-
+### ประมวลผล Dummy Data แบบสำรวจความพึงพอใจ 100 ชุด แบบ Batch อัตโนมัติ
+Data : [Sentiment Data (Click!!!)](https://docs.google.com/spreadsheets/d/1RhQWTeL1bKHKBOYOZRroSpC8VWmeCPMCMjfuFXqMhDA/edit?usp=sharing)
 ### โครงสร้าง Dummy Data
 
 | ฟิลด์ | คำอธิบาย | ตัวอย่าง |
@@ -2137,19 +2110,12 @@ Text Analysis for Government Services
 
 ### Workshop B Workflow
 
-```
-[Manual Trigger / Schedule Trigger]
-      ↓
-[Google Sheets: อ่าน Dummy Data 100 แถว]
-      ↓
-[SplitInBatches Node: แบ่ง batch ละ 10]
-      ↓
-[AI/LLM Node: วิเคราะห์ทีละรายการ]
-      ↓
-[Code Node: รวมผลลัพธ์]
-      ↓
-[Google Sheets: เขียนผลกลับ + สรุป]
-```
+<div class="center">
+
+![w:900px](fig/m5_Ex2.png)
+
+</div>
+
 
 ---
 
@@ -2471,9 +2437,8 @@ return [{
 ### การตั้งค่า Environment Variables ใน n8n
 
 ```bash
-# ตั้งค่าใน .env file หรือ Docker environment
-N8N_ENCRYPTION_KEY=your-32-byte-secret-key-here
-ENCRYPTION_KEY=your-aes-256-encryption-key
+# ตั้งค่าในตัวแปรใน Variables
+ENCRYPTION_KEY=your-32-byte-secret-key-here
 ```
 
 ---
@@ -2515,12 +2480,14 @@ Summary & What's Next
 
 **Module 7:** Workshop Basic AI Agent on n8n — สร้าง Agent ที่ตัดสินใจและใช้เครื่องมือได้
 
+
+
 ---
 
 <!-- _class: lead -->
 
-# ข้อมูลปลอดภัย พร้อมสู่ AI!
+# จบ Day 1 แล้ว!
 
-**Module 7:** Basic AI Agent on n8n
+**พรุ่งนี้ Day 2:** พัฒนา AI Agent สำหรับงานสถิติ
 
-มาสร้าง AI ที่ทำงานแทนเราได้อย่างชาญฉลาด
+ขอบคุณทุกท่านที่ตั้งใจเรียน — พบกันพรุ่งนี้ 09.00 น.

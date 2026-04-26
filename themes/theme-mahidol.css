@@ -65,7 +65,7 @@ h2 {
 /* specificity (0,1,2) — beats ul/ol { margin:0 } (0,0,1) and h3 { margin-top } (0,0,1) */
 /* :not(.divider) prevents adding 108px margin between the two h2s on divider slides */
 section:not(.divider) h2 + * {
-  margin-top: 108px;
+  margin-top: 86px;
 }
 
 h3 {

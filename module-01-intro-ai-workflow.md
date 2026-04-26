@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: mahidol-purple
+theme: mahidol
 paginate: true
 size: 16:9
 footer: "n8n Workflow Automation | Module 1 — Introduction AI and Workflow Automation | สำนักงานสถิติแห่งชาติ"
