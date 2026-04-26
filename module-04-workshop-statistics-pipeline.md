@@ -389,15 +389,49 @@ POST https://your-org.webhook.office.com/...
 
 ## Workshop 4.1 — Population Statistics Pipeline
 
-### โจทย์: สร้าง Automated Pipeline
+### โจทย์: สร้าง Automated Pipeline **Dataset:** ข้อมูลประชากรจากสำนักงานสถิติแห่งชาติ (NSO)
+```
+GET https://catalog.nso.go.th/api/3/action/datastore_search
+    ?resource_id=57ff7cd9-27e3-4dc5-b6ad-e8280ab18a05&limit=5000
+```
 
-**ความต้องการ:**
-1. ดึงข้อมูลประชากรรายจังหวัดจาก Open Data API
-2. คำนวณ: ค่าเฉลี่ย, สูงสุด, ต่ำสุด, รวมทั้งประเทศ
-3. แยกข้อมูล TOP 5 และ BOTTOM 5 จังหวัด
-4. Export เป็น Excel Report
-5. ส่ง Email สรุปพร้อมแนบไฟล์
-6. ตั้งเวลาให้รันอัตโนมัติทุกต้นเดือน
+1. ดึงข้อมูลประชากรรายจังหวัดจาก NSO Open Data API
+2. กรองเฉพาะข้อมูลรวมรายจังหวัด (area=รวม, sex=รวม, age_group=รวม)
+3. คำนวณ: ค่าเฉลี่ย, สูงสุด, ต่ำสุด, รวมทั้งประเทศ
+4. แยกข้อมูล TOP 5 และ BOTTOM 5 จังหวัดตามจำนวนประชากร
+5. Export เป็น Excel Report และส่ง Email สรุปอัตโนมัติ
+
+---
+
+## โครงสร้างข้อมูล NSO Dataset
+
+
+| ฟิลด์ | ชนิด | ตัวอย่างค่า | ความหมาย |
+|---|---|---|---|
+| `year` | numeric | `2533`, `2543`, `2553` | ปีพุทธศักราช |
+| `region` | text | `ทั่วประเทศ`, `กลาง` | ภาค |
+| `province` | text | `รวม`, `กรุงเทพมหานคร` | จังหวัด |
+| `area` | text | `รวม`, `ในเขตเทศบาล` | ประเภทพื้นที่ |
+| `sex` | text | `รวม`, `ชาย`, `หญิง` | เพศ |
+| `age_group` | text | `รวม`, `0-4` | กลุ่มอายุ |
+| `value` | numeric | `54548530` | จำนวนประชากร (คน) |
+
+> **Total records: 38,720** | **ปีข้อมูล:** พ.ศ. 2533–ปัจจุบัน
+
+---
+<!-- _class: dense -->
+## Hint: ขั้นตอนที่ 1 — HTTP Request Node
+
+### ตั้งค่า HTTP Request (ระบุปีที่ต้องการ)
+
+**วิธีที่ 1 — Query String (เร็ว, Filter ฝั่ง Server):**
+```
+Method:  GET
+URL:     https://catalog.nso.go.th/api/3/action/datastore_search
+         ?resource_id=57ff7cd9-27e3-4dc5-b6ad-e8280ab18a05
+         &limit=5000&filters={"year":2563}
+```
+
 
 
 
@@ -409,111 +443,86 @@ POST https://your-org.webhook.office.com/...
 
 <div class="center">
 
-![w:1000px](fig/m4_Ex1.png)
+![w:900px](fig/m4_Ex1.png)
 
 </div>
 
 
-
 ---
 
 <!-- _class: highlight -->
 
-## Workshop 4.2 — Household Finance Analysis
+## Workshop 4.2 — Household Finance Analysis Pipeline
 
-**โจทย์: วิเคราะห์ฐานะทางการเงินครัวเรือนไทยจาก NSO Open Data**
+### โจทย์: วิเคราะห์ฐานะทางการเงินครัวเรือนไทยจาก NSO Open Data
 
-**แหล่งข้อมูล 3 ชุด (NSO Data Catalog):**
-- **ชุดที่ 1:** ค่าใช้จ่ายเฉลี่ยต่อเดือนของครัวเรือน จำแนกตามประเภทค่าใช้จ่าย
-- **ชุดที่ 2:** หนี้สินเฉลี่ยต่อครัวเรือน จำแนกตามวัตถุประสงค์การกู้ยืม
-- **ชุดที่ 3:** อัตราการมีงานทำต่อประชากรวัยแรงงาน จำแนกตามระดับการศึกษา
+
+
+| | Dataset | resource_id |
+|---|---|---|
+| **ชุดที่ 1** | ค่าใช้จ่ายเฉลี่ยต่อเดือนของครัวเรือน จำแนกตามประเภทค่าใช้จ่าย | `697c9b29-d937-4c4e-9d9f-122ff085488b` |
+| **ชุดที่ 2** | หนี้สินเฉลี่ยต่อครัวเรือน จำแนกตามวัตถุประสงค์การกู้ยืม | `89cc71ae-f596-4307-b38f-10d61d084801` |
+
+**ความต้องการ:**
+1. ดึงข้อมูลจาก 2 API พร้อมกัน (Parallel)
+2. คำนวณ **สัดส่วนหนี้สิน/ค่าใช้จ่าย** จำแนกตามสถานะทางเศรษฐสังคม
+3. หาจังหวัดที่มีภาระหนี้สูงสุด / ต่ำสุด
+4. สร้าง Summary Report ส่ง Email อัตโนมัติ
 
 ---
 
-<!-- _class: highlight -->
+## โครงสร้างข้อมูล: ชุดที่ 1 — ค่าใช้จ่ายครัวเรือน
 
-## Workshop 4.2 — Household Finance Analysis (ต่อ)
-**สิ่งที่ต้องสร้าง:**
-1. Parallel HTTP Request จาก 3 API (NSO Catalog CSV)
-2. Clean & Normalize แต่ละ dataset
-3. Merge ค่าใช้จ่าย + หนี้สิน (match: `year` + `province` + `soc_eco_class2`)
-4. คำนวณ Debt-to-Expenditure Ratio รายสถานะเศรษฐสังคม
-5. Map จังหวัด → ภาค และ Merge กับอัตราการจ้างงาน
-6. ส่งรายงานไปยัง Google Sheets และ Email อัตโนมัติ
+**Resource ID:** `697c9b29-d937-4c4e-9d9f-122ff085488b` | **Total: 10,780 records** | **ปีข้อมูล:** 2566
+
+| ฟิลด์ | ชนิด | ตัวอย่างค่า |
+|---|---|---|
+| `year` | text | `"2566"` |
+| `province` | text | `"กรุงเทพมหานคร"`, `"เชียงใหม่"` |
+| `soc_eco_class1` | text | `"ลูกจ้าง"`, `"ผู้ประกอบธุรกิจ..."`, `"ผู้ถือครองทำการเกษตร..."` |
+| `soc_eco_class2` | text | รายละเอียดสถานะ เช่น `"ผู้จัดการนักวิชาการ..."` |
+| `type_expenditure1` | text | `"ค่าใช้จ่ายเพื่อการอุปโภคบริโภค"` / `"ค่าใช้จ่ายทั้งสิ้นต่อเดือน"` |
+| `type_expenditure2` | text | `"อาหารและเครื่องดื่ม"`, `"ที่อยู่อาศัย..."`, `"การศึกษา"` |
+| `value` | numeric | `21740.00` (บาท/เดือน) |
+
+```
+GET https://catalog.nso.go.th/api/3/action/datastore_search
+    ?resource_id=697c9b29-d937-4c4e-9d9f-122ff085488b&limit=5000
+```
+
+---
+
+## โครงสร้างข้อมูล: ชุดที่ 2 — หนี้สินครัวเรือน
+
+**Resource ID:** `89cc71ae-f596-4307-b38f-10d61d084801` | **Total: 7,700 records** | **ปีข้อมูล:** 2566
+
+| ฟิลด์ | ชนิด | ตัวอย่างค่า |
+|---|---|---|
+| `year` | text | `"2566"` |
+| `province` | text | `"กรุงเทพมหานคร"`, `"สมุทรปราการ"` |
+| `soc_eco_class1` | text | `"ลูกจ้าง"`, `"ผู้ประกอบธุรกิจ..."`, `"ผู้ถือครองทำการเกษตร..."` |
+| `soc_eco_class2` | text | รายละเอียดสถานะ เช่น `"คนงานด้านการขนส่ง..."` |
+| `hhdebt_totaldebt` | text | `"จำนวนครัวเรือนทั้งสิ้น"` / `"จำนวนหนี้สินเฉลี่ยต่อครัวเรือน"` |
+| `purpose_source_bor` | text | `"จำนวนหนี้สินเฉลี่ยต่อครัวเรือน"` / `"ใช้ซื้อ/เช่าซื้อบ้าน..."` / `"หนี้ในระบบ"` |
+| `value` | numeric | `300000.00` (บาท) หรือ จำนวนครัวเรือน |
+| `unit` | text | `"บาท"` หรือ `"ครัวเรือน"` |
+
+```
+GET https://catalog.nso.go.th/api/3/action/datastore_search
+    ?resource_id=89cc71ae-f596-4307-b38f-10d61d084801&limit=5000
+```
 
 ---
 <!-- _class: dense -->
-## Dataset: NSO Catalog APIs
+## Hint: ขั้นตอนที่ 1 — ดึงข้อมูล 2 แหล่งพร้อมกัน
 
-| Dataset | NSO Table | ระดับ | Columns หลัก |
-|---|---|---|---|
-| ค่าใช้จ่ายครัวเรือน | `SFD_SPB0804` | จังหวัด | year, province, soc_eco_class2, type_expenditure1, value |
-| หนี้สินครัวเรือน | `SFD_SPB0806` | จังหวัด | year, province, soc_eco_class2, purpose_source_bor, value |
-| อัตราการมีงานทำ | `OS_02_0016_02` | ภาค/เขต | year, quarter, region, area, level_of_edu, value |
+### Workflow Structure (Parallel HTTP Requests)
 
-**API Pattern (NSO Catalog):**
-```
-GET https://catalogapi.nso.go.th/api/index?table={TABLE_NAME}&format=csv
-```
 
-> ⚠️ **ข้อควรระวัง:** ค่าใช้จ่ายและหนี้สินมีระดับ **จังหวัด** แต่อัตราการมีงานทำมีระดับ **ภาค**
-> ต้อง groupBy จังหวัด → ภาคก่อน Merge ชุดที่ 2
-
----
-<!-- _class: dense -->
-## Workflow Structure — Workshop 4.2
-### Workflow Structure
 <div class="center">
 
-![w:1000px](fig/m4_Ex2.png)
-</div>
+![w:900px](fig/m4_Ex2.png)
 
-
----
-<!-- _class: dense -->
-## Code Node: Debt-to-Expenditure Ratio
-<div class="columns">
-<div>
-
-### สูตรคำนวณ
-
-$$\text{DE Ratio} = \frac{\text{หนี้สินเฉลี่ย}}{\text{ค่าใช้จ่าย/เดือน} \times 12}$$
-
-| DE Ratio | ระดับความเสี่ยง |
-|---|---|
-| < 1.0 | 🟢 ต่ำ |
-| 1.0 – 3.0 | 🟡 ปานกลาง |
-| > 3.0 | 🔴 สูง |
-
-> `soc_eco_class2` = สถานะเศรษฐสังคม เช่น เกษตรกร / ลูกจ้าง / ผู้ประกอบการ
-
-</div>
-<div>
-
-```javascript
-const PROVINCE_REGION = {
-  'กรุงเทพมหานคร': 'กลาง','เชียงใหม่': 'เหนือ',
-  'ขอนแก่น': 'ตะวันออกเฉียงเหนือ', 'สงขลา': 'ใต้',
-  // ... ครบ 77 จังหวัด
-};
-const merged = $input.all().map(i => i.json);
-return merged.map(row => {
-  const annual = row.expenditure * 12;
-  const de = annual > 0
-    ? row.debt / annual : null;
-  const risk = de === null ? 'N/A'
-    : de < 1 ? 'LOW'
-    : de < 3 ? 'MEDIUM' : 'HIGH';
-  return { json: {
-    ...row,
-    region: PROVINCE_REGION[row.province],
-    de_ratio: de?.toFixed(2),
-    risk_level: risk
-  }};
-});
-```
-
-</div>
 </div>
 
 ---
@@ -531,6 +540,9 @@ return merged.map(row => {
 
 ### การพัฒนา Workflow คุณภาพสูง
 
+<div class="columns">
+<div>
+
 **1. ตั้งชื่อ Node ให้ชัดเจน**
 - ❌ `HTTP Request 1`, `Set 3`
 - ✅ `GET Population Data`, `Calculate Summary Stats`
@@ -539,10 +551,16 @@ return merged.map(row => {
 - อธิบาย Logic ซับซ้อน
 - บันทึก API Documentation Reference
 
+</div>
+<div>
+
 **3. แยก Workflow ตามหน้าที่**
 - Workflow หลัก (Main Pipeline)
 - Workflow Error Handler แยกต่างหาก
 - Workflow Utility Functions
+
+</div>
+</div>
 
 ---
 
@@ -568,7 +586,6 @@ return merged.map(row => {
 - ✅ **Data Cleaning & Aggregation** ด้วย Code Node
 - ✅ **Merge ข้อมูล** จากหลายแหล่งด้วย Merge Node
 - ✅ **Excel Report + Email** ส่งรายงานอัตโนมัติ
-- ✅ **Error Handling & Monitoring** จัดการ Production
 - ✅ **Security Best Practices** สำหรับภาครัฐ
 
 ---
@@ -581,23 +598,3 @@ return merged.map(row => {
 
 คุณพร้อมแล้วที่จะนำ Automation ไปใช้ในงานสถิติภาครัฐ
 
----
-
-## ขั้นตอนถัดไป
-
-### Next Steps หลังจากหลักสูตรนี้
-
-**ทำทันที (สัปดาห์แรก):**
-- เลือก 1 Use Case ในงานของคุณที่ทำซ้ำทุกเดือน
-- ติดตั้ง n8n บน Server ของหน่วยงาน
-- สร้าง Workflow แรกสำหรับงานนั้น
-
-**ระยะกลาง (1-3 เดือน):**
-- ขยาย Automation ไปยัง Workflow อื่นๆ
-- เชื่อมต่อระบบ Database ภายในองค์กร
-- สร้าง Dashboard อัตโนมัติ
-
-**ทรัพยากรเพิ่มเติม:**
-- docs.n8n.io — Documentation อย่างเป็นทางการ
-- community.n8n.io — n8n Community Forum
-- data.go.th — Open Government Data ไทย
