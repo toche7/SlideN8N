@@ -28,25 +28,6 @@ math: katex
 ผศ. ดร.ทวีศักดิ์ สมานชื่น
 CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
----
-
-## ทบทวน Day 1
-
-### สิ่งที่ผ่านมาแล้ว
-
-| Module | หัวข้อ |
-|---|---|
-| **Module 1** | Introduction AI and Workflow Automation |
-| **Module 2** | Introduction to n8n |
-| **Module 3** | Workshop: Basic Workflow — Data Table & Google Sheets |
-| **Module 4** | Workshop: Statistics Data Pipeline |
-| **Module 5** | Workshop: Sentiment Analysis & Satisfaction (100 ชุด) |
-| **Module 6** | Encryption Sensitive Data |
-| **Module 7** | Workshop: Basic AI Agent + AI Agent with Tools |
-
-### Day 2 Focus
-
-**AI Agent ระดับสูง** — วิเคราะห์ข้อมูลสถิติจริง + ใช้งานในหน่วยงาน
 
 ---
 

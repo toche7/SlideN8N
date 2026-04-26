@@ -104,34 +104,43 @@ Data Protection in Government Statistics
 
 ## 3 วิธีหลักในการปกป้องข้อมูล
 
-### 1. Symmetric Encryption (AES)
+<div class="columns">
+<div>
 
+### 🔒 Symmetric Encryption (AES)
 - ใช้ Key เดียวทั้งเข้าและถอดรหัส
-- เหมาะกับ: ข้อมูลที่ต้องถอดรหัสได้ภายหลัง (เช่น เลขบัตรประชาชน)
-- ใน n8n: Code Node + Node.js `crypto` module
+- **ถอดรหัสได้** — ต้องมี Secret Key
+- เหมาะกับ: เลขบัตรประชาชน, ข้อมูลที่ต้องนำกลับมาใช้
+- ใน n8n: Code Node + `crypto` module
 
-### 2. Hashing (SHA-256 / bcrypt)
+### #️⃣ Hashing (SHA-256 / bcrypt)
+- เปลี่ยนข้อมูลเป็น Hash **ย้อนกลับไม่ได้**
+- เหมาะกับ: Password, Checksum
+- ตรวจสอบความถูกต้องโดยไม่ต้องเห็นข้อมูลเดิม
 
-- เปลี่ยนข้อมูลเป็น Hash ที่ย้อนกลับไม่ได้
-- เหมาะกับ: Password, Checksum ตรวจสอบความครบถ้วนของข้อมูล
+</div>
+<div>
 
-### 3. Tokenization
-
+### 🎫 Tokenization
 - แทนข้อมูลจริงด้วย Token สุ่ม
-- เหมาะกับ: บัตรเครดิต, เลขบัตรประชาชน ที่ต้องใช้แบบ Reference
+- เหมาะกับ: บัตรเครดิต, เลขบัตรประชาชน แบบ Reference
+- ข้อมูลจริงเก็บในระบบแยก (Token Vault)
+
+
+
+</div>
+</div>
 
 ---
 
-## เปรียบเทียบ: Encryption vs Hashing
+## เปรียบเทียบ
 
-### เลือกใช้อะไรเมื่อไหร่?
 
-| | **Encryption (AES)** | **Hashing (SHA-256)** |
+| วิธี | ถอดรหัส? | ใช้เมื่อ |
 |---|---|---|
-| **ถอดรหัสได้?** | ✅ ได้ (ถ้ามี Key) | ❌ ไม่ได้ |
-| **ใช้เมื่อ** | ต้องการข้อมูลเดิมคืน | ตรวจสอบความถูกต้อง |
-| **ตัวอย่าง** | เก็บเลขบัตรประชาชน | เก็บ Password |
-| **Key จำเป็น?** | ✅ ต้องมี Secret Key | ❌ ไม่ต้อง |
+| AES | ✅ | ต้องการข้อมูลเดิม |
+| SHA-256 | ❌ | ตรวจสอบเท่านั้น |
+| Token | ✅ (via vault) | Reference ปลอดภัย |
 
 ---
 
@@ -148,62 +157,44 @@ Data Protection in Government Statistics
 
 ### โครงสร้าง Workflow
 
-```
-[Webhook: รับข้อมูลแบบฟอร์ม]
-      ↓
-[Code Node: Hash Password + Encrypt PII]
-      ↓
-[IF Node: ตรวจสอบข้อมูลครบถ้วน]
-      ↓
-[Google Sheets: บันทึกข้อมูลเข้ารหัสแล้ว]
-      ↓
-[Respond to Webhook: ยืนยันการบันทึก]
-```
+<div class="center">
+
+![w:800px](fig/m6_Ex1.png)
+
+</div>
 
 ### ข้อมูลที่รับเข้ามา (Input)
 ```json
 { "name": "สมชาย ใจดี", "id_card": "1234567890123", "email": "somchai@nso.go.th" }
 ```
-
 ---
-
+<!-- _class: dense -->
 ## Code Node: AES Encryption
-
-### ตัวอย่าง JavaScript ใน n8n
 
 ```javascript
 const crypto = require('crypto');
-
-const SECRET_KEY = $env.ENCRYPTION_KEY; // 32-byte key จาก n8n Environment
+const SECRET_KEY = $vars.ENCRYPTION_KEY; // 32-byte key จาก n8n Environment
 const IV = crypto.randomBytes(16);
-
 function encrypt(text) {
   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(SECRET_KEY), IV);
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   return IV.toString('hex') + ':' + encrypted;
 }
-
-return [{
+return {
   json: {
-    name: $input.item.json.name,           // เก็บชื่อตามปกติ
-    id_card_encrypted: encrypt($input.item.json.id_card),  // เข้ารหัสเลขบัตร
-    email_hash: crypto.createHash('sha256').update($input.item.json.email).digest('hex')
+    name: $json.name,           // เก็บชื่อตามปกติ
+    id_card_encrypted: encrypt($json.id_card),  // เข้ารหัสเลขบัตร
+    email_hash: crypto.createHash('sha256').update($json.email).digest('hex'),
   }
-}];
-```
-
+};
+``` 
+<!-- 
 ---
-
 ## Code Node: ถอดรหัส (Decrypt)
-
-### ใช้เมื่อต้องการข้อมูลเดิมคืน
-
 ```javascript
 const crypto = require('crypto');
-
 const SECRET_KEY = $env.ENCRYPTION_KEY;
-
 function decrypt(encryptedText) {
   const [ivHex, encrypted] = encryptedText.split(':');
   const iv = Buffer.from(ivHex, 'hex');
@@ -212,7 +203,6 @@ function decrypt(encryptedText) {
   decrypted += decipher.final('utf8');
   return decrypted;
 }
-
 return [{
   json: {
     id_card_original: decrypt($input.item.json.id_card_encrypted)
@@ -220,7 +210,10 @@ return [{
 }];
 ```
 
-> **สำคัญ:** Secret Key ต้องเก็บใน n8n Environment Variables เท่านั้น ห้ามใส่ใน Code โดยตรง
+> **สำคัญ:** Secret Key ต้องเก็บใน n8n Environment Variables เท่านั้น ห้ามใส่ใน Code โดยตรง 
+
+-->
+
 
 ---
 
@@ -244,9 +237,8 @@ return [{
 ### การตั้งค่า Environment Variables ใน n8n
 
 ```bash
-# ตั้งค่าใน .env file หรือ Docker environment
-N8N_ENCRYPTION_KEY=your-32-byte-secret-key-here
-ENCRYPTION_KEY=your-aes-256-encryption-key
+# ตั้งค่าในตัวแปรใน Variables
+ENCRYPTION_KEY=your-32-byte-secret-key-here
 ```
 
 ---
@@ -288,12 +280,14 @@ Summary & What's Next
 
 **Module 7:** Workshop Basic AI Agent on n8n — สร้าง Agent ที่ตัดสินใจและใช้เครื่องมือได้
 
+
+
 ---
 
 <!-- _class: lead -->
 
-# ข้อมูลปลอดภัย พร้อมสู่ AI!
+# จบ Day 1 แล้ว!
 
-**Module 7:** Basic AI Agent on n8n
+**พรุ่งนี้ Day 2:** พัฒนา AI Agent สำหรับงานสถิติ
 
-มาสร้าง AI ที่ทำงานแทนเราได้อย่างชาญฉลาด
+ขอบคุณทุกท่านที่ตั้งใจเรียน — พบกันพรุ่งนี้ 09.00 น.

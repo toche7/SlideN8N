@@ -84,7 +84,7 @@ Text Analysis for Government Services
 ### ความซับซ้อนของภาษาไทย
 
 - 🗣️ **ภาษาพูด vs ภาษาเขียน** — ความแตกต่างสูงในการสื่อสาร
-- 🔄 **บริบทมีผล** — "ดีนะ" อาจเป็น Sarcasm ได้
+- 🔄 **บริบทมีผล** — "ดีนะ" อาจเป็นการเสียดีได้
 - 📝 **คำย่อ / ภาษาสแลง** — ใช้กันทั่วไปในแบบประเมิน
 - 🤖 **LLM เข้าใจบริบท** — GPT / Claude วิเคราะห์ได้แม่นกว่า Keyword Matching
 
@@ -93,6 +93,28 @@ Text Analysis for Government Services
 ```
 รับข้อความ → ส่งให้ LLM (via n8n AI Node) → ได้ผล Sentiment + เหตุผล
 ```
+
+---
+## Prompt Engineering: Prompt Template 
+> **System Message:** คุณเป็นผู้เชี่ยวชาญวิเคราะห์ความคิดเห็นภาษาไทย ตอบเฉพาะในรูปแบบ JSON เท่านั้น  
+> รูปแบบ: `{ "sentiment": "positive|neutral|negative", "score": 1-10, "summary": "สรุปสั้นๆ", "category": "หมวดหมู่" }`
+
+> **User:**  `วิเคราะห์ความคิดเห็นนี้: "เจ้าหน้าที่ใจดีมาก แต่ต้องรอนานกว่า 2 ชั่วโมง"`
+
+> **AI:** 
+>  ```json
+> { "sentiment": "neutral", "score": 5,
+>   "summary": "พนักงานบริการดี แต่มีปัญหาเรื่องเวลารอ",
+>   "category": "เวลารอ / ขั้นตอน" }
+
+
+---
+## Prompt Engineering
+### หลักการ Prompt ที่ดี
+- กำหนด Role ชัดเจน
+- ระบุ Output Format (JSON)
+- ให้ตัวอย่าง (Few-shot) ถ้าจำเป็น
+
 
 ---
 
@@ -111,11 +133,7 @@ Text Analysis for Government Services
 
 ```text
 คุณเป็นผู้เชี่ยวชาญวิเคราะห์ความคิดเห็นภาษาไทย
-วิเคราะห์ข้อความต่อไปนี้และตอบในรูปแบบ JSON:
-
-ข้อความ: "{{ $json.feedback }}"
-
-ตอบในรูปแบบ:
+วิเคราะห์ข้อความต่อไปนี้และตอบในรูปแบบ JSON: 
 {
   "sentiment": "positive" | "neutral" | "negative",
   "score": 1-10,
@@ -124,10 +142,6 @@ Text Analysis for Government Services
 }
 ```
 
-### หลักการ Prompt ที่ดี
-- กำหนด Role ชัดเจน
-- ระบุ Output Format (JSON)
-- ให้ตัวอย่าง (Few-shot) ถ้าจำเป็น
 
 ---
 
@@ -142,43 +156,14 @@ Text Analysis for Government Services
 
 ## Workshop A: Sentiment Analysis Workflow
 
-### เป้าหมาย
 
-สร้าง Workflow ที่รับข้อความ → วิเคราะห์ Sentiment → บันทึกผลลงฐานข้อมูล
+###  Workflow
+<div class="center">
 
-### โครงสร้าง Workflow
+![w:900px](fig/m5_Ex1.png)
 
-```
-[Webhook Trigger]
-      ↓
-[Set Node: เตรียม Prompt]
-      ↓
-[OpenAI / LLM Node: วิเคราะห์ Sentiment]
-      ↓
-[Code Node: แปลง JSON Output]
-      ↓
-[Google Sheets: บันทึกผล]
-      ↓
-[Respond to Webhook: ส่งผลกลับ]
-```
+</div>
 
----
-
-## ขั้นตอน Workshop A — Step by Step
-
-### Step 1–3: ตั้งค่า Input
-
-1. **Webhook Node** — รับ POST request ที่มี field `feedback`
-2. **Set Node** — สร้าง Prompt จาก `{{ $json.body.feedback }}`
-3. **AI/LLM Node** — เชื่อมต่อ OpenAI `gpt-4o-mini` พร้อม Prompt
-
-### Step 4–6: ประมวลผลและบันทึก
-
-4. **Code Node** — Parse JSON จาก LLM response
-5. **Google Sheets Node** — เพิ่มแถวใหม่ด้วย sentiment, score, summary
-6. **Respond to Webhook** — ส่ง JSON response กลับ
-
-> **ทดสอบ:** ส่ง POST request จาก Postman หรือ n8n Test Webhook
 
 ---
 
@@ -198,7 +183,12 @@ Text Analysis for Government Services
 }
 ```
 
+---
+## ตัวอย่างผลลัพธ์ Workshop A (ต่อ) 
+
 **บันทึกลง Google Sheets** → คอลัมน์: วันที่, ข้อความ, Sentiment, Score, Summary, Category
+
+> Note: Score ที่ได้จากการทำงานของ LLM ไม่ได้เป็นผลการคำนวณแต่เป็นการประมาณค่าของ LLM ต้องระมัดระวังในการนำไปใช้งาน
 
 ---
 
@@ -213,10 +203,8 @@ Text Analysis for Government Services
 
 ## Workshop B: Satisfaction Analysis Pipeline
 
-### เป้าหมาย
-
-ประมวลผล Dummy Data แบบสำรวจความพึงพอใจ 100 ชุด แบบ Batch อัตโนมัติ
-
+### ประมวลผล Dummy Data แบบสำรวจความพึงพอใจ 100 ชุด แบบ Batch อัตโนมัติ
+Data : [Sentiment Data (Click!!!)](https://docs.google.com/spreadsheets/d/1RhQWTeL1bKHKBOYOZRroSpC8VWmeCPMCMjfuFXqMhDA/edit?usp=sharing)
 ### โครงสร้าง Dummy Data
 
 | ฟิลด์ | คำอธิบาย | ตัวอย่าง |
@@ -233,19 +221,12 @@ Text Analysis for Government Services
 
 ### Workshop B Workflow
 
-```
-[Manual Trigger / Schedule Trigger]
-      ↓
-[Google Sheets: อ่าน Dummy Data 100 แถว]
-      ↓
-[SplitInBatches Node: แบ่ง batch ละ 10]
-      ↓
-[AI/LLM Node: วิเคราะห์ทีละรายการ]
-      ↓
-[Code Node: รวมผลลัพธ์]
-      ↓
-[Google Sheets: เขียนผลกลับ + สรุป]
-```
+<div class="center">
+
+![w:900px](fig/m5_Ex2.png)
+
+</div>
+
 
 ---
 

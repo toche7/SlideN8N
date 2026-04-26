@@ -28,6 +28,25 @@ math: katex
 ผศ. ดร.ทวีศักดิ์ สมานชื่น
 CBTU · คณะวิศวกรรมศาสตร์ · มหาวิทยาลัยมหิดล
 
+
+---
+
+## ทบทวน Day 1
+
+
+| Module | หัวข้อ |
+|---|---|
+| **Module 1** | Introduction AI and Workflow Automation |
+| **Module 2** | Introduction to n8n |
+| **Module 3** | Workshop: Basic Workflow — Data Table & Google Sheets |
+| **Module 4** | Workshop: Statistics Data Pipeline |
+| **Module 5** | Workshop: Sentiment Analysis & Satisfaction (100 ชุด) |
+| **Module 6** | Encryption Sensitive Data |
+
+### Day 2 Focus
+
+**AI Agent** — Introduction to AI Agent + วิเคราะห์ข้อมูลสถิติจริง + ใช้งานในหน่วยงาน
+
 ---
 
 ## วัตถุประสงค์การเรียนรู้
@@ -73,7 +92,9 @@ From Workflow to Autonomous Agent
 | **Tools** | ไม่มี | เรียกใช้ Tool เองได้ |
 | **Memory** | ไม่มี | จำบริบทได้ |
 
+---
 ### AI Agent คือ
+
 > Workflow ที่มี LLM เป็น "สมอง" ตัดสินใจเองว่าจะทำขั้นตอนใด ด้วยเครื่องมืออะไร
 
 ---
@@ -83,17 +104,8 @@ From Workflow to Autonomous Agent
 ### Reasoning + Acting Loop
 
 ```
-[คำถามจากผู้ใช้]
-      ↓
-[Reasoning: LLM คิดว่าต้องทำอะไร]
-      ↓
-[Action: เรียกใช้ Tool ที่เลือก]
-      ↓
-[Observation: ดูผลลัพธ์จาก Tool]
-      ↓
-[Reasoning: พอแล้วหรือต้องทำต่อ?]
-      ↓
-[Final Answer: ตอบผู้ใช้]
+[คำถามจากผู้ใช้]-> [Reasoning: LLM คิดว่าต้องทำอะไร] -> [Action: เรียกใช้ Tool ที่เลือก]->
+[Observation: ดูผลลัพธ์จาก Tool]->[Reasoning: พอแล้วหรือต้องทำต่อ?]->[Final Answer: ตอบผู้ใช้]
 ```
 
 ### ตัวอย่าง
@@ -113,6 +125,16 @@ From Workflow to Autonomous Agent
 | **Trigger** | Chat Trigger / Webhook | รับ Input จากผู้ใช้ |
 
 ---
+## AI Agent n8n Workflow
+
+<div class="center">
+
+![w:700px](fig/m7_AIagent.png)
+
+</div>
+
+---
+
 
 <!-- _class: divider -->
 
@@ -129,7 +151,6 @@ Basic AI Agent พร้อม Memory
 
 สร้าง AI Chatbot ที่จำบริบทการสนทนาได้ พร้อม System Prompt สำหรับงานสถิติ
 
-### โครงสร้าง Workflow
 
 ```
 [Chat Trigger]
@@ -142,6 +163,15 @@ Basic AI Agent พร้อม Memory
 ```
 
 ---
+## Workflow Lab A
+
+<div class="center">
+
+![w:700px](fig/m7_Ex1.png)
+
+</div>
+
+---
 
 ## ขั้นตอน Lab A — Step by Step
 
@@ -150,6 +180,10 @@ Basic AI Agent พร้อม Memory
 1. **Chat Trigger Node** — เปิด n8n Chat UI สำหรับทดสอบ
 2. **AI Agent Node** — เพิ่ม Node ประเภท `AI Agent`
 
+
+---
+
+## ขั้นตอน Lab A — Step by Step
 ### Step 3: กำหนด System Prompt
 
 ```text
@@ -158,7 +192,6 @@ Basic AI Agent พร้อม Memory
 - อธิบายข้อมูลสถิติและตีความผลลัพธ์
 - แนะนำวิธีวิเคราะห์ข้อมูลที่เหมาะสม
 - ตอบคำถามเกี่ยวกับกระบวนการสถิติภาครัฐ
-
 ตอบเป็นภาษาไทย กระชับ ชัดเจน และเป็นมืออาชีพ
 ```
 
@@ -321,12 +354,4 @@ Summary & What's Next
 
 **Module 8:** พัฒนา AI Agent ตอบคำถาม/วิเคราะห์ข้อมูลสถิติ
 
----
 
-<!-- _class: lead -->
-
-# จบ Day 1 แล้ว!
-
-**พรุ่งนี้ Day 2:** พัฒนา AI Agent สำหรับงานสถิติจริง
-
-ขอบคุณทุกท่านที่ตั้งใจเรียน — พบกันพรุ่งนี้ 09.00 น.
