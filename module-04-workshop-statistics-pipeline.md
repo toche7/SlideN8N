@@ -66,28 +66,12 @@ Statistics Data Pipeline Design
 
 ### End-to-End Data Pipeline
 
-```
-┌──────────────────────────────────────────────────┐
-│                  n8n Scheduler                   │
-│                (ทุกวันเวลา 06:00)                  │
-└─────────────────────┬────────────────────────────┘
-                      │
-         ┌────────────┼────────────┐
-         ▼            ▼            ▼
-    [NSO API]    [Fiscal DB]   [Survey Form]
-         │            │            │
-         └────────────┴────────────┘
-                      │ Merge Data
-                      ▼
-               [Data Cleaning]
-                      │
-                      ▼
-              [Data Aggregation]
-                      │
-               ┌──────┴──────┐
-               ▼             ▼
-          [Excel Report]  [Email Alert]
-```
+
+<div class="center">
+
+![w:900px](fig/m4_end-to-end.png)
+
+</div>
 
 ---
 
@@ -98,7 +82,7 @@ Statistics Data Pipeline Design
 | แหล่งข้อมูล | URL | ประเภทข้อมูล |
 |---|---|---|
 | **data.go.th** | api.data.go.th | Open Government Data |
-| **NESDC** | statbbi.nso.go.th | สถิติเศรษฐกิจ |
+| **Data Catalog** | catalog.nso.go.th | สถิติเศรษฐกิจ |
 | **BOT** | api.bot.or.th | ข้อมูลการเงิน |
 | **DDC** | covid19.ddc.moph.go.th | สุขภาพ |
 | **Open-Meteo** | api.open-meteo.com | สภาพอากาศ (Free) |
@@ -110,73 +94,50 @@ Statistics Data Pipeline Design
 ## 02
 ## แหล่งข้อมูลสถิติภาครัฐ
 
-Government Open Data Sources
+ระบบบัญชีข้อมูลสำนักงานสถิติแห่งชาติ NSO Data Catalog
 
 ---
 
-## data.go.th — Open Government Data
+## [catalog.nso.go.th](https://catalog.nso.go.th)
+
+<div class="columns">
+<div>
 
 ### การเข้าถึงข้อมูลภาครัฐ
 
 **ขั้นตอนการใช้งาน:**
-1. ลงทะเบียนที่ `data.go.th` เพื่อรับ API Key
-2. ค้นหา Dataset ที่ต้องการ
-3. ดู API Documentation ของ Dataset นั้น
+1. ค้นหา Dataset ที่ต้องการ
+2. ดู API Documentation ของ Dataset นั้น
+
+</div>
+<div>
 
 **ตัวอย่าง API Call:**
 ```
-GET https://opend.data.go.th/get-ckan/datastore_search
-    ?resource_id={resource_id}
+GET https://catalog.nso.go.th/api/3/action/datastore_search
+    ?resource_id=a2443986-6b68-4f44-a94b-b84b0fc50c96
     &limit=100
-Header: api-key: YOUR_API_KEY
 ```
+
+</div>
+</div>
 
 ---
 
-## ตัวอย่าง: ข้อมูลประชากรจาก NSO
+## ตัวอย่าง: รายได้เฉลี่ยต่อเดือนของครัวเรือน (NSO)
 
-### API สำมะโนประชากร
-
+**CKAN API (NSO Catalog):**
 ```
-GET https://statbbi.nso.go.th/staticreport/page/sector/th/01.aspx
-```
-
-**หรือใช้ CKAN API:**
-```json
-GET https://opend.data.go.th/get-ckan/datastore_search
-Request Body:
-{
-  "resource_id": "population-by-province-2566",
-  "limit": 77,
-  "sort": "population desc"
-}
+GET https://catalog.nso.go.th/api/3/action/datastore_search
+    ?resource_id=a2443986-6b68-4f44-a94b-b84b0fc50c96
+    &limit=100
 ```
 
-**ผลลัพธ์:** ข้อมูลประชากรรายจังหวัด 77 จังหวัด
+**Columns ที่ได้:** `YEAR`, `REGION`, `AREA`, `MONTHLY_INCOME`, `FROM_WORK`, `PROPERTY_INCOME`, `CURRENT_TRANSFER`, `NONMONEY_INCOME`
 
----
+**ผลลัพธ์:** รายได้เฉลี่ยต่อเดือนของครัวเรือน จำแนกตามภาคและพื้นที่ (พ.ศ. 2500–2562)
 
-## การจัดการ Pagination
 
-### ดึงข้อมูลขนาดใหญ่แบบ Page by Page
-
-```javascript
-// Code Node: Loop through pages
-const totalRecords = $json.total;
-const limit = 100;
-const totalPages = Math.ceil(totalRecords / limit);
-
-const urls = [];
-for (let page = 0; page < totalPages; page++) {
-  urls.push({
-    json: {
-      url: `https://api.example.go.th/data?limit=${limit}&offset=${page * limit}`,
-      page: page + 1
-    }
-  });
-}
-return urls;
-```
 
 ---
 
@@ -193,72 +154,92 @@ return urls;
 
 ### ขั้นตอนการทำความสะอาดข้อมูล
 
-```
-Raw Data (JSON/CSV)
-        │
-        ▼
-┌──────────────────┐
-│ 1. Remove Nulls  │ → กรองข้อมูลที่ไม่ครบ
-│ 2. Type Casting  │ → แปลง String → Number
-│ 3. Normalize     │ → ชื่อจังหวัด → มาตรฐาน
-│ 4. Deduplicate   │ → ลบข้อมูลซ้ำ
-└──────────────────┘
-        │
-        ▼
-  Clean Data ✓
-```
+
+<div class="center">
+
+![w:900px](fig/m4_cleaningData.png)
+
+</div>
 
 ---
-
+<!-- _class: dense -->
 ## Code Node: Data Cleaning
 
-### ทำความสะอาดข้อมูลสถิติ
+<div class="columns">
+<div>
+
+### ขั้นตอน
+
+1. **กรอง** ข้อมูลที่ไม่ครบ
+2. **แปลงชนิด** String → Number/Date
+3. **ตรวจค่า** ที่ไม่สมเหตุสมผล
+
+> Input: JSON จาก HTTP Request
+> Output: Array ของ Items ที่สะอาด
+
+</div>
+<div>
 
 ```javascript
 const items = $input.all();
-
 return items
-  // 1. กรองข้อมูลที่ไม่ครบ
-  .filter(item => item.json.province && item.json.value !== null)
-  // 2. แปลงประเภทข้อมูล
+  .filter(item =>
+    item.json.province &&
+    item.json.value !== null)
   .map(item => ({
     json: {
       province: item.json.province.trim(),
       value: parseFloat(item.json.value) || 0,
       year: parseInt(item.json.year),
-      category: item.json.category?.toUpperCase() || 'UNKNOWN',
       updated_at: new Date().toISOString()
     }
   }))
-  // 3. กรองค่าที่ไม่สมเหตุสมผล
-  .filter(item => item.json.value >= 0 && item.json.year >= 2500);
+  .filter(item =>
+    item.json.value >= 0 &&
+    item.json.year >= 2500);
 ```
+
+</div>
+</div>
 
 ---
+<!-- _class: dense -->
+## Code Node:  Data Aggregation
 
-## Data Aggregation
+<div class="columns">
+<div>
 
-### สรุปข้อมูลสถิติ
+### สิ่งที่คำนวณได้
+
+| ค่า | วิธีคำนวณ |
+|---|---|
+| `total` | รวมทุก record |
+| `avg` | total ÷ จำนวน |
+| `max` / `min` | ค่าสูง/ต่ำสุด |
+| `by_region` | groupBy ภาค |
+
+</div>
+<div>
 
 ```javascript
-const items = $input.all();
-const data = items.map(i => i.json);
-
-// คำนวณสถิติพื้นฐาน
+const data = $input.all()
+  .map(i => i.json);
 const values = data.map(d => d.value);
-const total = values.reduce((a, b) => a + b, 0);
-const avg = total / values.length;
-const max = Math.max(...values);
-const min = Math.min(...values);
-
-// จัดกลุ่มตามภูมิภาค
+const total = values.reduce((a,b) => a+b, 0);
+const avg   = total / values.length;
+const max   = Math.max(...values);
+const min   = Math.min(...values);
 const byRegion = data.reduce((acc, item) => {
-  acc[item.region] = (acc[item.region] || 0) + item.value;
+  acc[item.region] =
+    (acc[item.region] || 0) + item.value;
   return acc;
 }, {});
-
-return [{ json: { total, avg, max, min, by_region: byRegion } }];
+return [{ json: { total, avg, max, min,
+                  by_region: byRegion } }];
 ```
+
+</div>
+</div>
 
 ---
 
@@ -271,7 +252,7 @@ return [{ json: { total, avg, max, min, by_region: byRegion } }];
 ```
 [Population API] ──┐
                    ├──► [Merge Node] ──► [Code: คำนวณ GDP/capita]
-[GDP API]       ──┘     (Join by "province_code")
+[GDP API]        ──┘     (Join by "province_code")
 ```
 
 **การตั้งค่า Merge Node:**
@@ -294,161 +275,110 @@ return [{ json: { total, avg, max, min, by_region: byRegion } }];
 
 ### Workflow: Monthly Report Generation
 
-```
-[Schedule: วันที่ 1 ของเดือน]
-         │
-         ▼
-[HTTP: ดึงข้อมูลเดือนก่อน]
-         │
-         ▼
-[Code: คำนวณ Summary]
-         │
-    ┌────┴────┐
-    ▼         ▼
-[Spreadsheet] [Set: สร้าง Email Body]
-    │         │
-    └────┬────┘
-         ▼
-[Send Email พร้อม Attachment]
-```
+
+<div class="center">
+
+![w:900px](fig/m4_Report.png)
+
+</div>
+
 
 ---
 
+<!-- _class: dense -->
+
 ## Template รายงาน HTML Email
 
-### สร้าง Email Report สวยงาม
+<div class="columns">
+<div>
+
+**โครงสร้าง Email:**
+- `<h2>` — หัวข้อรายงาน
+- `<table>` — ตารางข้อมูล
+- Header row สี `#1B4F72`
+- ใส่ n8n expressions `{{ }}` ในแต่ละ cell
+
+> ใช้ใน **Send Email Node**
+> ช่อง Body → HTML mode
+
+</div>
+<div>
 
 ```html
-<h2>รายงานสถิติประจำเดือน {{ $json.month }}</h2>
-<table border="1" style="border-collapse:collapse; width:100%">
-  <tr style="background:#1B4F72; color:white">
-    <th>ตัวชี้วัด</th><th>ค่า</th><th>เปลี่ยนแปลง</th>
+<h2>รายงานสถิติ {{ $json.month }}</h2>
+<table border="1"
+  style="border-collapse:collapse;width:100%">
+  <tr style="background:#1B4F72;color:white">
+    <th>ตัวชี้วัด</th>
+    <th>ค่า</th>
+    <th>เปลี่ยนแปลง</th>
   </tr>
   <tr>
-    <td>ประชากรทั้งหมด</td>
-    <td>{{ $json.total_population }}</td>
-    <td>{{ $json.pop_change }}%</td>
-  </tr>
-  <tr>
-    <td>GDP รวม (ล้านบาท)</td>
-    <td>{{ $json.gdp_total }}</td>
-    <td>{{ $json.gdp_change }}%</td>
+    <td>รายได้เฉลี่ย (บาท/เดือน)</td>
+    <td>{{ $json.avg_income }}</td>
+    <td>{{ $json.income_change }}%</td>
   </tr>
 </table>
 ```
 
+</div>
+</div>
+
 ---
 
-## ระบบแจ้งเตือนความผิดปกติ
 
-### Alert Workflow
+## ระบบแจ้งเตือนความผิดปกติ : Psuedo Code
 
-**เงื่อนไขการแจ้งเตือน:**
-
-```javascript
-// Code Node: ตรวจสอบ Anomaly
-const items = $input.all();
-const alerts = [];
-
-items.forEach(item => {
-  const { indicator, value, threshold, previous } = item.json;
-  const changePercent = Math.abs((value - previous) / previous * 100);
-  
-  if (changePercent > threshold) {
-    alerts.push({
-      json: {
-        indicator,
-        message: `⚠️ ${indicator} เปลี่ยนแปลง ${changePercent.toFixed(1)}% (เกิน ${threshold}%)`,
-        severity: changePercent > threshold * 2 ? 'HIGH' : 'MEDIUM'
-      }
-    });
-  }
-});
-
-return alerts.length > 0 ? alerts : [{ json: { no_alerts: true } }];
+```
+สำหรับแต่ละ item:
+  คำนวณ pct = |value - previous| / previous × 100
+  ถ้า pct > threshold:
+    สร้าง alert:
+      - indicator = ชื่อตัวชี้วัด
+      - message   = "เปลี่ยนแปลง X%"
+      - severity  = HIGH  (ถ้า pct > threshold × 2)
+                    MEDIUM (อื่นๆ)
+    เพิ่มเข้า alerts[]
+ถ้า alerts ไม่ว่าง → return alerts
+ไม่มี alert        → return { no_alerts: true }
 ```
 
 ---
 
 ## Integration กับช่องทางอื่น
 
-### ส่งแจ้งเตือนผ่านช่องทางต่างๆ
+<div class="columns">
+<div>
 
 **LINE Notify:**
 ```
 POST https://notify-api.line.me/api/notify
 Header: Authorization: Bearer {LINE_TOKEN}
-Body:   message=⚠️ ข้อมูลสถิติผิดปกติ: {{ $json.message }}
-```
-
-**Microsoft Teams (Webhook):**
-```json
-{
-  "text": "📊 รายงานสถิติประจำวัน\n{{ $json.summary }}"
-}
+Body:   message={{ $json.message }}
 ```
 
 **Slack:**
 - ใช้ Slack Node ใน n8n โดยตรง
+
+</div>
+<div>
+
+**Microsoft Teams (Webhook):**
+```json
+POST https://your-org.webhook.office.com/...
+{
+  "text": "รายงานสถิติประจำวัน\n{{ $json.summary }}"
+}
+```
+
+</div>
+</div>
 
 ---
 
 <!-- _class: divider -->
 
 ## 05
-## Error Handling & Monitoring
-
-จัดการ Error และ Monitor ระบบ
-
----
-
-## Error Handling ใน n8n
-
-### วิธีจัดการ Error
-
-**1. Error Trigger Node**
-- สร้าง Workflow แยกสำหรับจัดการ Error
-- ใช้ Error Trigger รับ Error จาก Workflow หลัก
-
-**2. Try/Catch ด้วย IF Node**
-```
-[HTTP Request] → Error? → [IF: statusCode !== 200]
-                              │ True
-                              ▼
-                     [Set: error_message]
-                              │
-                              ▼
-                     [Send Alert Email]
-```
-
----
-
-## Monitoring Workflow
-
-### ติดตามการทำงานของระบบ
-
-**Execution Log ใน n8n:**
-- ดูประวัติการรัน Workflow ทั้งหมด
-- Success / Failed / Waiting
-- เวลาที่ใช้แต่ละ Execution
-
-**การตั้ง Notifications:**
-```
-Settings → Workflow Settings →
-  On Error: Send Email to Admin
-  Save Execution: Always / Error Only
-```
-
-**Best Practice:**
-- Log ทุก Execution ใน Production
-- ตั้ง Alert เมื่อ Workflow Failed
-- Review Log ทุกสัปดาห์
-
----
-
-<!-- _class: divider -->
-
-## 06
 ## Workshop Exercise
 
 สร้าง Full Statistics Pipeline
@@ -469,88 +399,128 @@ Settings → Workflow Settings →
 5. ส่ง Email สรุปพร้อมแนบไฟล์
 6. ตั้งเวลาให้รันอัตโนมัติทุกต้นเดือน
 
+
+
+---
+<!-- _class: dense -->
+## Hint: Workshop 4.1
+
+### Workflow Structure
+
+<div class="center">
+
+![w:1000px](fig/m4_Ex1.png)
+
+</div>
+
+
+
 ---
 
 <!-- _class: highlight -->
 
-## Workshop 4.2 — Multi-Source Dashboard Feed
+## Workshop 4.2 — Household Finance Analysis
 
-### โจทย์: รวมข้อมูลจาก 3 แหล่ง
+**โจทย์: วิเคราะห์ฐานะทางการเงินครัวเรือนไทยจาก NSO Open Data**
 
-**แหล่งข้อมูล:**
-- **แหล่งที่ 1:** อุณหภูมิรายจังหวัด (Open-Meteo API)
-- **แหล่งที่ 2:** ข้อมูลประชากร (Simulated API)
-- **แหล่งที่ 3:** ดัชนีราคา (Simulated API)
+**แหล่งข้อมูล 3 ชุด (NSO Data Catalog):**
+- **ชุดที่ 1:** ค่าใช้จ่ายเฉลี่ยต่อเดือนของครัวเรือน จำแนกตามประเภทค่าใช้จ่าย
+- **ชุดที่ 2:** หนี้สินเฉลี่ยต่อครัวเรือน จำแนกตามวัตถุประสงค์การกู้ยืม
+- **ชุดที่ 3:** อัตราการมีงานทำต่อประชากรวัยแรงงาน จำแนกตามระดับการศึกษา
 
+---
+
+<!-- _class: highlight -->
+
+## Workshop 4.2 — Household Finance Analysis (ต่อ)
 **สิ่งที่ต้องสร้าง:**
-1. Parallel HTTP Requests (3 แหล่งพร้อมกัน)
-2. Merge ข้อมูลด้วย Province Code
-3. คำนวณ Composite Index
-4. ส่ง JSON ไปยัง Webhook Dashboard
+1. Parallel HTTP Request จาก 3 API (NSO Catalog CSV)
+2. Clean & Normalize แต่ละ dataset
+3. Merge ค่าใช้จ่าย + หนี้สิน (match: `year` + `province` + `soc_eco_class2`)
+4. คำนวณ Debt-to-Expenditure Ratio รายสถานะเศรษฐสังคม
+5. Map จังหวัด → ภาค และ Merge กับอัตราการจ้างงาน
+6. ส่งรายงานไปยัง Google Sheets และ Email อัตโนมัติ
 
 ---
+<!-- _class: dense -->
+## Dataset: NSO Catalog APIs
 
-## แนวทางแก้ Workshop 4.1
+| Dataset | NSO Table | ระดับ | Columns หลัก |
+|---|---|---|---|
+| ค่าใช้จ่ายครัวเรือน | `SFD_SPB0804` | จังหวัด | year, province, soc_eco_class2, type_expenditure1, value |
+| หนี้สินครัวเรือน | `SFD_SPB0806` | จังหวัด | year, province, soc_eco_class2, purpose_source_bor, value |
+| อัตราการมีงานทำ | `OS_02_0016_02` | ภาค/เขต | year, quarter, region, area, level_of_edu, value |
 
+**API Pattern (NSO Catalog):**
+```
+GET https://catalogapi.nso.go.th/api/index?table={TABLE_NAME}&format=csv
+```
+
+> ⚠️ **ข้อควรระวัง:** ค่าใช้จ่ายและหนี้สินมีระดับ **จังหวัด** แต่อัตราการมีงานทำมีระดับ **ภาค**
+> ต้อง groupBy จังหวัด → ภาคก่อน Merge ชุดที่ 2
+
+---
+<!-- _class: dense -->
+## Workflow Structure — Workshop 4.2
 ### Workflow Structure
+<div class="center">
 
-```
-[Schedule Trigger: วันที่ 1 เวลา 08:00]
-         │
-         ▼
-[HTTP: GET Population API]
-         │
-         ▼
-[Code: Data Cleaning + Validation]
-         │
-         ▼
-[Code: Calculate Statistics]
-         │
-    ┌────┴────────────┐
-    ▼                 ▼
-[Code: TOP/BOTTOM 5] [Set: Email Summary]
-    │                 │
-    ▼                 │
-[Spreadsheet: Excel] │
-    │                 │
-    └────────┬────────┘
-             ▼
-    [Send Email + Attachment]
-```
+![w:1000px](fig/m4_Ex2.png)
+</div>
+
 
 ---
+<!-- _class: dense -->
+## Code Node: Debt-to-Expenditure Ratio
+<div class="columns">
+<div>
 
-## Code: สร้างรายงานสรุป
+### สูตรคำนวณ
 
-### สรุปข้อมูลประชากรรายจังหวัด
+$$\text{DE Ratio} = \frac{\text{หนี้สินเฉลี่ย}}{\text{ค่าใช้จ่าย/เดือน} \times 12}$$
+
+| DE Ratio | ระดับความเสี่ยง |
+|---|---|
+| < 1.0 | 🟢 ต่ำ |
+| 1.0 – 3.0 | 🟡 ปานกลาง |
+| > 3.0 | 🔴 สูง |
+
+> `soc_eco_class2` = สถานะเศรษฐสังคม เช่น เกษตรกร / ลูกจ้าง / ผู้ประกอบการ
+
+</div>
+<div>
 
 ```javascript
-const items = $input.all();
-const provinces = items.map(i => i.json);
-
-// คำนวณสถิติ
-const populations = provinces.map(p => p.population);
-const total = populations.reduce((a, b) => a + b, 0);
-const avg = Math.round(total / provinces.length);
-
-// TOP 5 - จังหวัดที่มีประชากรมากสุด
-const top5 = [...provinces]
-  .sort((a, b) => b.population - a.population)
-  .slice(0, 5);
-
-// BOTTOM 5 - จังหวัดที่มีประชากรน้อยสุด
-const bottom5 = [...provinces]
-  .sort((a, b) => a.population - b.population)
-  .slice(0, 5);
-
-return [{ json: { total, avg, top5, bottom5, year: 2567 } }];
+const PROVINCE_REGION = {
+  'กรุงเทพมหานคร': 'กลาง','เชียงใหม่': 'เหนือ',
+  'ขอนแก่น': 'ตะวันออกเฉียงเหนือ', 'สงขลา': 'ใต้',
+  // ... ครบ 77 จังหวัด
+};
+const merged = $input.all().map(i => i.json);
+return merged.map(row => {
+  const annual = row.expenditure * 12;
+  const de = annual > 0
+    ? row.debt / annual : null;
+  const risk = de === null ? 'N/A'
+    : de < 1 ? 'LOW'
+    : de < 3 ? 'MEDIUM' : 'HIGH';
+  return { json: {
+    ...row,
+    region: PROVINCE_REGION[row.province],
+    de_ratio: de?.toFixed(2),
+    risk_level: risk
+  }};
+});
 ```
+
+</div>
+</div>
 
 ---
 
 <!-- _class: divider -->
 
-## 07
+## 06
 ## Best Practices & Production Tips
 
 แนวทางปฏิบัติที่ดีสำหรับ Production

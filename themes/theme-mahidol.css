@@ -348,3 +348,26 @@ section.budget {
   margin-right: 10px;
   flex-shrink: 0;
 }
+
+/* ─── Dense layout (code-heavy slides) ──────────── */
+section.dense {
+  font-size: 22px;
+}
+section.dense pre,
+section.dense code {
+  font-size: 0.95em;
+  line-height: 1.35;
+}
+section.dense p,
+section.dense li {
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+section.dense h2 {
+  font-size: 30px;
+  margin-bottom: 0.3em;
+}
+section.dense h3 {
+  font-size: 22px;
+  margin-bottom: 0.2em;
+}

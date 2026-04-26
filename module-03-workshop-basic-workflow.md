@@ -479,7 +479,7 @@ Parameters:
 </div>
 
 ---
-## Hint Workflow Exercise 3.1
+## Hint: Workflow for Exercise 3.1
 
 <div class="center">
 
@@ -521,7 +521,7 @@ Parameters:
 
 
 ---
-## Hint Workflow Exercise 3.2
+## Hint: Workflow for Exercise 3.2
 
 <div class="center">
 
