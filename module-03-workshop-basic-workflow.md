@@ -439,7 +439,7 @@ Columns:
 <!-- _class: divider -->
 
 ## 06
-## Workshop Exercise
+## Workshop 
 
 ฝึกปฏิบัติ
 
@@ -447,7 +447,7 @@ Columns:
 
 <!-- _class: highlight -->
 
-## แบบฝึกหัด 3.1 — รายงานอากาศอัตโนมัติ
+## Workshop A — รายงานอากาศอัตโนมัติ
 
 <div class="columns">
 <div>
@@ -479,7 +479,7 @@ Parameters:
 </div>
 
 ---
-## Hint: Workflow for Exercise 3.1
+## Hint: Workflow for Workshop A
 
 <div class="center">
 
@@ -491,7 +491,7 @@ Parameters:
 
 <!-- _class: highlight -->
 
-## แบบฝึกหัด 3.2 — Data Cleaning Pipeline
+## Workshop B — Data Cleaning Pipeline
 
 <div class="columns">
 <div>
@@ -521,13 +521,25 @@ Parameters:
 
 
 ---
-## Hint: Workflow for Exercise 3.2
+## Hint: Workflow for Workshop B
 
 <div class="center">
 
 ![w:900px](fig/m3_ex2.png)
 
 </div>
+
+---
+## curl for testing
+```bash
+curl -X POST "https://itmmu.app.n8n.cloud/webhook-test/survey-data" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Ake",
+    "email": "ake@example.com",
+    "feedback": "This is my feedback"
+  }'
+```
 
 ---
 

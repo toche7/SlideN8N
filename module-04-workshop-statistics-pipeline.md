@@ -387,7 +387,7 @@ POST https://your-org.webhook.office.com/...
 
 <!-- _class: highlight -->
 
-## Workshop 4.1 — Population Statistics Pipeline
+## Workshop A — Population Statistics Pipeline
 
 ### โจทย์: สร้าง Automated Pipeline **Dataset:** ข้อมูลประชากรจากสำนักงานสถิติแห่งชาติ (NSO)
 ```
@@ -437,7 +437,7 @@ URL:     https://catalog.nso.go.th/api/3/action/datastore_search
 
 ---
 <!-- _class: dense -->
-## Hint: Workshop 4.1
+## Hint: Workshop A
 
 ### Workflow Structure
 
@@ -452,7 +452,7 @@ URL:     https://catalog.nso.go.th/api/3/action/datastore_search
 
 <!-- _class: highlight -->
 
-## Workshop 4.2 — Household Finance Analysis Pipeline
+## Workshop B — Household Finance Analysis Pipeline
 
 ### โจทย์: วิเคราะห์ฐานะทางการเงินครัวเรือนไทยจาก NSO Open Data
 
