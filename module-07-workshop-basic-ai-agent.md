@@ -139,13 +139,13 @@ From Workflow to Autonomous Agent
 <!-- _class: divider -->
 
 ## 02
-## Workshop Lab A
+## Workshop A
 
 Basic AI Agent พร้อม Memory
 
 ---
 
-## Lab A: สร้าง Basic AI Agent
+## Workshop A: สร้าง Basic AI Agent
 
 ### เป้าหมาย
 
@@ -163,7 +163,7 @@ Basic AI Agent พร้อม Memory
 ```
 
 ---
-## Workflow Lab A
+## Workflow Workshop A
 
 <div class="center">
 
@@ -173,7 +173,7 @@ Basic AI Agent พร้อม Memory
 
 ---
 
-## ขั้นตอน Lab A — Step by Step
+## ขั้นตอน Workshop A — Step by Step
 
 ### Step 1–2: ตั้งค่า Trigger และ Agent
 
@@ -183,7 +183,7 @@ Basic AI Agent พร้อม Memory
 
 ---
 
-## ขั้นตอน Lab A — Step by Step
+## ขั้นตอน Workshop A — Step by Step
 ### Step 3: กำหนด System Prompt
 
 ```text
@@ -201,7 +201,7 @@ Basic AI Agent พร้อม Memory
 
 ---
 
-## ทดสอบ Lab A
+## ทดสอบ Workshop A
 
 ### ตัวอย่างการทดสอบ Memory
 
@@ -216,7 +216,7 @@ Basic AI Agent พร้อม Memory
 <!-- _class: divider -->
 
 ## 03
-## Workshop Lab B
+## Workshop  B
 
 AI Agent with Tools
 
@@ -232,9 +232,8 @@ AI Agent with Tools
 
 | Tool | ฟังก์ชัน | ใช้เมื่อ |
 |---|---|---|
-| **get_statistics** | ดึงข้อมูลสถิติจาก Google Sheets | ผู้ใช้ถามข้อมูลตัวเลข |
-| **calculate_summary** | คำนวณ Mean, Min, Max | ผู้ใช้ต้องการสรุปสถิติ |
-| **search_data** | ค้นหาข้อมูลตาม keyword | ผู้ใช้ค้นหาข้อมูลเฉพาะ |
+| **statData** | สถิติประชากร Google Sheets | ผู้ใช้ถามข้อมูลตัวเลข |
+| **calculate** | คำนวณ Mean, Min, Max | ผู้ใช้ต้องการสรุปสถิติ |
 
 ---
 
@@ -250,45 +249,72 @@ AI Agent with Tools
     ├── Memory: Window Buffer Memory
     └── Tools:
         ├── [Tool: get_statistics] → [Google Sheets Node]
-        ├── [Tool: calculate_summary] → [Code Node: คำนวณ]
-        └── [Tool: search_data] → [Google Sheets Filter]
-      ↓
-[Respond to Chat]
+        ├── [Tool: calculate_summary] → [Calculator: คำนวณ]
+
 ```
 
 ---
+## Workshop B: Workflow
 
-## ขั้นตอน Lab B — สร้าง Tool
+<div class="center">
 
-### วิธีเพิ่ม Tool ใน n8n AI Agent
+![w:700px](fig/m7_Ex2.png)
 
-1. ใน **AI Agent Node** คลิก **Add Tool**
-2. เลือก **Call n8n Sub-Workflow** หรือ **HTTP Request**
-3. ตั้งชื่อ Tool: `get_statistics`
-4. เขียน Tool Description (สำคัญมาก — LLM อ่านเพื่อตัดสินใจ):
+</div>
+
+---
+
+## ขั้นตอน Workshop B — สร้าง Tool
+
+### System Prompt
 
 ```text
-ใช้เครื่องมือนี้เมื่อผู้ใช้ถามเกี่ยวกับข้อมูลสถิติหรือตัวเลขจากฐานข้อมูล
-Input: { "period": "ปีหรือเดือนที่ต้องการ", "category": "หมวดหมู่สถิติ" }
-Output: ข้อมูลสถิติในรูปแบบตาราง
+You are a helpful assistant for statistical reports.
+Get data from the statistics Google Sheet and
+Use the calculator tool to compute all statistical values. 
+Do not calculate statistics mentally or estimate values. 
+Use the sheet data as the source of truth and show the final results clearly.
 ```
 
 ---
 
-## ทดสอบ Lab B
+## ขั้นตอน Workshop B — สร้าง Tool
+
+<div class="columns">
+<div >
+
+![w:420px](fig/m7_Ex2_data.png)
+
+</div>
+<div>
+
+### Tool Descriptions
+```text
+Get row(s) in sheet in Google Sheets
+ข้อมูลที่อยู่ใน sheet เป็นข้อมุลประชากร
+ในแต่ละจังหวัด
+```
+
+</div>
+</div>
+
+
+---
+
+## ทดสอบ  Workshop B
 
 ### ตัวอย่างการทำงาน Agent with Tools
 
-**ผู้ใช้:** "ข้อมูลอัตราการจ้างงานปี 2567 เป็นเท่าไหร่?"
+**ผู้ใช้:** จำนวนประชากรทั้งหมด"
 
 **Agent คิด (Reasoning):**
-- ต้องดึงข้อมูลจากฐานข้อมูล → เรียกใช้ Tool: `get_statistics`
+- ต้องดึงข้อมูลจากฐานข้อมูล → เรียกใช้ Tool: `google sheet`
 
-**Agent เรียก Tool:** `{ "period": "2567", "category": "การจ้างงาน" }`
+**Agent เรียก Tool:** `calculator ประชากรในแต่ละจังหวัด`
 
-**Tool ส่งผลกลับ:** `{ "rate": "67.2%", "total": "38.5M", "change": "+0.3%" }`
+**Tool ส่งผลกลับ:** `220`
 
-**Agent ตอบ:** "อัตราการจ้างงานปี 2567 อยู่ที่ 67.2% หรือประมาณ 38.5 ล้านคน เพิ่มขึ้น 0.3% จากปีก่อนครับ"
+**Agent ตอบ:** "จำนวนประชากรทั้งหมด = 220 คน"
 
 ---
 
@@ -350,8 +376,5 @@ Summary & What's Next
 - ✅ **Tool Description** — เขียน Description ที่ดีเพื่อให้ LLM เลือกถูก
 - ✅ **Debug & Best Practice** — ตรวจสอบและปรับปรุง Agent
 
-### วันพรุ่งนี้ (Day 2)
-
-**Module 8:** พัฒนา AI Agent ตอบคำถาม/วิเคราะห์ข้อมูลสถิติ
 
 

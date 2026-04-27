@@ -74,8 +74,7 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 [n8n AI Agent Node (GPT-4o)]
     ├── Tool: search_knowledge_base → [Vector Store (เอกสารสถิติ)]
     ├── Tool: query_statistics_db  → [Google Sheets / Database]
-    ├── Tool: calculate_statistics → [Code Node: สูตรคำนวณ]
-    └── Tool: generate_summary     → [Code Node: สรุปรายงาน]
+    └── Tool: calculate_statistics → [Calculator ]
           ↓
 [ตอบคำถาม + อ้างอิงแหล่งข้อมูล]
 ```
@@ -98,13 +97,111 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 <!-- _class: divider -->
 
 ## 02
-## Workshop Lab A
+## RAG คืออะไร?
+
+Retrieval-Augmented Generation
+
+---
+
+## RAG: ทำไม LLM ถึงต้องดึงข้อมูลเพิ่ม?
+
+### ปัญหาของ LLM ล้วน ๆ
+
+<div class="columns">
+<div>
+
+**LLM อย่างเดียว**
+- ความรู้มีวันหมดอายุ (Training Cutoff)
+- ไม่รู้ข้อมูลภายในองค์กร
+- อาจ "hallucinate" ตัวเลขสถิติ
+- ไม่สามารถอ้างอิงแหล่งที่มาได้
+
+</div>
+<div>
+
+**LLM + RAG**
+- ดึงข้อมูลสด ณ เวลาถาม
+- เข้าถึงเอกสารและ DB ภายใน
+- คำตอบมีหลักฐานอ้างอิง
+- ลด Hallucination ได้มาก
+
+</div>
+</div>
+
+---
+<!-- _class: dense -->
+## RAG ทำงานอย่างไร?
+
+### 3 ขั้นตอนหลัก
+
+```
+① Indexing (ทำครั้งเดียว)
+   เอกสาร PDF / Google Docs
+      ↓ แบ่งเป็น Chunks
+      ↓ สร้าง Embeddings (เวกเตอร์ความหมาย)
+      ↓ เก็บใน Vector Store
+② Retrieval (ทุกครั้งที่ถาม)
+   คำถามจากผู้ใช้
+      ↓ แปลงเป็น Embedding
+      ↓ ค้นหา Chunks ที่ใกล้เคียงที่สุด (Similarity Search)
+      ↓ ได้ Context ที่เกี่ยวข้อง 3–5 ชิ้น
+③ Generation
+   Context + คำถาม → LLM → คำตอบพร้อมอ้างอิง
+```
+
+---
+## RAG Basic Concept
+
+<div class="center">
+
+![w:900px](fig/m8_RAG.png)
+
+</div>
+
+---
+## RAG Process
+
+<div class="center">
+
+![w:1000px](fig/m8_RAGprocess.png)
+
+</div>
+
+---
+## RAG: Vector Represenation
+
+<div class="center">
+
+![w:800px](fig/m8_RAGvector.png)
+
+</div>
+
+---
+
+## RAG ในบริบทงานสถิติภาครัฐ
+
+### ตัวอย่างแหล่งข้อมูลที่นำเข้า Vector Store
+
+| ประเภทเอกสาร | เนื้อหา | ประโยชน์ |
+|---|---|---|
+| **รายงานสถิติรายปี** | ตัวเลข GDP, ประชากร, การจ้างงาน | ตอบคำถาม Factual |
+| **คู่มือนิยามสถิติ** | คำจำกัดความ, วิธีคำนวณ | ตอบคำถาม Conceptual |
+| **แผนยุทธศาสตร์** | เป้าหมาย, นโยบาย | ตอบคำถามเชิงนโยบาย |
+
+> **กฎทอง:** ข้อมูลที่ดี → RAG ที่ดี → Agent ที่น่าเชื่อถือ
+
+---
+
+<!-- _class: divider -->
+
+## 03
+## Workshop  A
 
 AI Agent with RAG (Knowledge Base)
 
 ---
-
-## Lab A: เชื่อม Knowledge Base กับ Agent
+<!-- _class: dense -->
+## Workshop A: เชื่อม Knowledge Base กับ Agent
 
 ### RAG = Retrieval-Augmented Generation
 
@@ -125,32 +222,45 @@ AI Agent with RAG (Knowledge Base)
 ```
 
 ---
-
+<!-- _class: dense -->
 ## การตั้งค่า Ingestion Workflow
 
 ### Workflow สำหรับโหลดข้อมูลเข้า Knowledge Base
 
 ```
-[Manual Trigger]
+[Upload File]
       ↓
-[Read PDF Node / Google Docs Node]
-      ↓
-[Recursive Character Text Splitter]
+[Simple Vector Store/Recursive Character Text Splitter]
   - Chunk size: 1000 characters
   - Chunk overlap: 200 characters
       ↓
-[OpenAI Embeddings Node]
+[Gemini/OpenAI Embeddings Node]
       ↓
 [In-Memory Vector Store: Insert Documents]
 ```
 
 > **หมายเหตุ:** สำหรับ Production ใช้ Pinecone หรือ Supabase pgvector แทน In-Memory
 
+
+
+---
+## Workshop A: Ingestion Workflow
+
+<div class="center">
+
+![w:700px](fig/m8_Ex1_1.png)
+
+</div>
+
 ---
 
-## Lab A: Agent with RAG Tool
+
+## Workshop A: Agent with RAG Tool
 
 ### โครงสร้าง Agent
+
+<div class="columns">
+<div>
 
 ```
 [Chat Trigger]
@@ -164,17 +274,32 @@ AI Agent with RAG (Knowledge Base)
       ↓
 [Respond to Chat]
 ```
+</div>
+<div>
 
 ### Tool Description สำหรับ `search_knowledge_base`
 ```text
 ค้นหาข้อมูลจากเอกสารสถิติและนิยามศัพท์ทางสถิติ
-ใช้เมื่อผู้ใช้ถามเกี่ยวกับคำนิยาม แนวทาง หรือรายละเอียดจากรายงานสถิติ
+ใช้เมื่อผู้ใช้ถามเกี่ยวกับคำนิยาม แนวทาง 
+หรือรายละเอียดจากรายงานสถิติ
 Input: { "query": "คำค้นหาที่ต้องการ" }
 ```
+</div>
+
+---
+## Workshop A: Ingestion Workflow
+
+<div class="center">
+
+![w:800px](fig/m8_Ex1_2.png)
+
+</div>
+
+
 
 ---
 
-## ทดสอบ Lab A
+## Workshop A: Test
 
 ### ตัวอย่างคำถามที่ใช้ RAG
 
@@ -193,13 +318,13 @@ Input: { "query": "คำค้นหาที่ต้องการ" }
 <!-- _class: divider -->
 
 ## 03
-## Workshop Lab B
+## Workshop B
 
 Agent วิเคราะห์ข้อมูลสถิติด้วย Sheets
 
 ---
 
-## Lab B: Agent + Statistics Database Tool
+## Workshop B: Agent + Statistics Database Tool
 
 ### เป้าหมาย
 
@@ -214,8 +339,8 @@ Agent ดึงข้อมูลสถิติจาก Google Sheets → ค�
 | `price_index` | year, month, cpi, ppi | ดัชนีราคา |
 
 ---
-
-## Lab B: Tool `query_statistics_db`
+<!-- _class: dense -->
+## Workshop B: Tool `query_statistics_db`
 
 ### Sub-Workflow สำหรับ Tool นี้
 
@@ -235,7 +360,7 @@ Agent ดึงข้อมูลสถิติจาก Google Sheets → ค�
 
 ---
 
-## ขั้นตอน Lab B — Step by Step
+## ขั้นตอน Workshop B — Step by Step
 
 ### การผูก Tool เข้ากับ Agent
 
@@ -252,7 +377,7 @@ Input: { "sheet": "ชื่อ sheet", "year": "ปีที่ต้องก�
 
 ---
 
-## ทดสอบ Lab B: Multi-step Reasoning
+## Workshop B: Test Multi-step Reasoning
 
 ### ตัวอย่างคำถามที่ซับซ้อน
 
@@ -276,7 +401,7 @@ Input: { "sheet": "ชื่อ sheet", "year": "ปีที่ต้องก�
 รวม Knowledge Base + Database ไว้ใน Agent เดียว
 
 ---
-
+<!-- _class: dense -->
 ## Multi-tool Agent Architecture
 
 ### Agent พร้อมทุก Tool สำหรับงานสถิติ
@@ -297,7 +422,7 @@ Input: { "sheet": "ชื่อ sheet", "year": "ปีที่ต้องก�
 ```
 
 ---
-
+<!-- _class: dense -->
 ## System Prompt สำหรับ Statistics Agent
 
 ### Prompt ที่ปรับแต่งสำหรับงานสถิติภาครัฐ
@@ -332,8 +457,8 @@ Summary & What's Next
 ### สิ่งที่เรียนรู้ใน Module นี้
 
 - ✅ **RAG Architecture** — Knowledge Base + Vector Store + Agent
-- ✅ **Lab A** — Agent ตอบคำถามจากเอกสารสถิติด้วย RAG
-- ✅ **Lab B** — Agent วิเคราะห์ข้อมูลจริงด้วย Statistics DB Tool
+- ✅ **Workshop A** — Agent ตอบคำถามจากเอกสารสถิติด้วย RAG
+- ✅ **Workshop B** — Agent วิเคราะห์ข้อมูลจริงด้วย Statistics DB Tool
 - ✅ **Multi-tool Agent** — รวม Tools หลายอย่างให้ Agent ใช้งาน
 - ✅ **System Prompt** — ปรับ Prompt สำหรับงานสถิติภาครัฐ
 

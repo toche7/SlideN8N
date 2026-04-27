@@ -116,35 +116,12 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 
 ---
 
-## Deploy ผ่าน Line OA
-
-### โครงสร้าง Line Bot + n8n Agent
-
-```
-[Line User ส่งข้อความ]
-      ↓
-[Line Webhook → n8n Webhook Trigger]
-      ↓
-[Set Node: แปลง Line Message Format]
-      ↓
-[AI Agent Node: ประมวลผล]
-      ↓
-[HTTP Request: ส่งคำตอบกลับผ่าน Line Reply API]
-      ↓
-[Line User ได้รับคำตอบ]
-```
-
-### การตั้งค่า Line
-
-1. สร้าง Line Official Account (Messaging API)
-2. ตั้ง Webhook URL = n8n Webhook URL
-3. เพิ่ม Channel Access Token ใน n8n Credentials
-
----
-
 ## Deploy ผ่าน n8n Chat Widget
 
 ### วิธีที่ง่ายที่สุด — ใช้ n8n Built-in
+
+<div class="columns">
+<div>
 
 ```
 [Chat Trigger Node]
@@ -156,23 +133,185 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
       ↓
 [Respond to Chat]
 ```
+</div>
+<div>
 
 **URL ที่ได้:** `https://your-n8n.domain/webhook/chat-agent`
 
 > ฝัง iframe บนเว็บไซต์หน่วยงานได้ทันที หรือแชร์ URL ให้เจ้าหน้าที่ภายใน
+
+</div>
+</div>
+
+
+---
+## Deploy ผ่าน Line OA
+
+### โครงสร้าง Line Bot + n8n Agent
+<div class="columns">
+<div>
+
+1. Line User ส่งข้อความ
+2. Line Webhook → n8n Webhook Trigger
+3. Set Node: แปลง Line Message Format
+4. AI Agent Node: ประมวลผล
+5. HTTP Request: ส่งคำตอบกลับผ่าน Line Reply API
+6. Line User ได้รับคำตอบ
+
+</div>
+<div>
+
+### การตั้งค่า Line
+
+1. สร้าง Line Official Account (Messaging API)
+2. ตั้ง Webhook URL = n8n Webhook URL
+3. เพิ่ม Channel Access Token ใน n8n Credentials
+
+</div>
+</div>
+
+---
+## Line Connection Diagram
+
+<div class="center">
+
+![w:900px](fig/m9_LineDiagram.png)
+
+</div>
+
 
 ---
 
 <!-- _class: divider -->
 
 ## 03
-## Workshop Lab
+## Workshop: Deploy on Line OA
+
+เชื่อมต่อ AI Agent กับ Line Official Account
+
+---
+
+## Workshop: ขั้นตอนเตรียม Line OA
+
+### Step 1–2: สร้างและตั้งค่า Line Channel
+
+<div class="columns">
+<div>
+
+**Step 1: สร้าง Line OA**
+1. ไปที่ [developers.line.biz](https://developers.line.biz)
+2. สร้าง Provider และ Channel ประเภท **Messaging API**
+3. บันทึก **Channel Access Token** และ **Channel Secret**
+
+</div>
+<div>
+
+**Step 2: ตั้ง Webhook บน Line**
+1. ใน n8n สร้าง Workflow ใหม่ → เพิ่ม **Webhook Trigger**
+2. คัดลอก Webhook URL
+3. วาง URL ใน Line Console → **Webhook URL**
+4. กด **Verify** และเปิด **Use webhook**
+
+</div>
+</div>
+
+---
+<!-- _class: dense -->
+## Workshop: สร้าง Workflow รับ-ส่ง Line
+
+### Step 3: โครงสร้าง Workflow
+
+```
+[Webhook Trigger]  ← Line ส่ง POST มา
+      ↓
+[Set Node: แกะ Message]
+  userId   = {{ $json.body.events[0].source.userId }}
+  message  = {{ $json.body.events[0].message.text }}
+  replyToken = {{ $json.body.events[0].replyToken }}
+      ↓
+[AI Agent Node]
+  Input: message
+      ↓
+[HTTP Request Node: Line Reply API]
+  Method: POST
+  URL: https://api.line.me/v2/bot/message/reply
+  Headers: Authorization: Bearer <Channel Access Token>
+  Body: { "replyToken": replyToken, "messages": [{ "type": "text", "text": agentAnswer }] }
+```
+
+---
+
+## Workshop: ตั้งค่า Credentials และทดสอบ
+
+### Step 4–5: เพิ่ม Credential และทดสอบ
+
+<div class="columns">
+<div>
+
+**Step 4: เพิ่ม Header Auth ใน n8n**
+1. ไปที่ Credentials → New
+2. ประเภท: **Header Auth**
+3. Name: `Authorization`
+4. Value: `Bearer <Channel Access Token>`
+5. ผูกกับ HTTP Request Node
+
+</div>
+<div>
+
+**Step 5: ทดสอบ**
+1. Activate Workflow
+2. เพิ่มเพื่อน Line OA ด้วย QR Code
+3. ส่งข้อความ "สวัสดี"
+4. Agent ควรตอบกลับภายใน 3 วินาที
+
+> ⚠️ Line ต้องการ HTTPS — ใช้ n8n Cloud หรือตั้ง Reverse Proxy
+
+</div>
+</div>
+
+---
+## Line Connector from Community
+
+<div class="center">
+
+![w:500px](fig/m9_LineCommunity.png)
+
+</div>
+
+---
+## Line Connector Installation
+
+<div class="center">
+
+![w:400px](fig/m9_LineInstall.png)
+
+</div>
+
+---
+## Line Workflow
+
+<div class="center">
+
+![w:800px](fig/m9_Ex1.png)
+
+</div>
+
+
+---
+
+<!-- _class: divider -->
+
+## 04
+## AI Agent Project
 
 สร้าง Agent พร้อม Deploy สำหรับหน่วยงาน
 
 ---
 
-## Workshop: สร้าง Agent ของหน่วยงานตัวเอง
+## Project: สร้าง Agent ของหน่วยงานตัวเอง
+
+<div class="columns">
+<div>
 
 ### เป้าหมาย
 
@@ -185,12 +324,17 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 - เลือก Data Source ที่มีอยู่
 - เขียน System Prompt เบื้องต้น
 
+</div>
+<div>
+
 **ช่วงที่ 2: สร้าง (30 นาที)**
 - Build Workflow ด้วย n8n
 - ทดสอบและปรับปรุง
 
 **ช่วงที่ 3: นำเสนอ (10 นาที)**
 - แต่ละกลุ่ม Demo ผลงาน
+
+</div>
 
 ---
 
@@ -230,7 +374,7 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 
 <!-- _class: divider -->
 
-## 04
+## 05
 ## Monitoring & Logging
 
 ดูแลระบบ AI Agent หลัง Deploy
@@ -240,6 +384,8 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 ## สิ่งที่ต้อง Monitor
 
 ### 4 มิติการ Monitor AI Agent
+<div class="columns">
+<div>
 
 **1. Usage Monitoring**
 - จำนวนคำถามต่อวัน / ต่อผู้ใช้
@@ -248,6 +394,9 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 **2. Quality Monitoring**
 - User Feedback (👍 / 👎 ปุ่มกด)
 - คำถามที่ Agent ตอบไม่ได้ (Escalation rate)
+</div>
+
+<div>
 
 **3. Cost Monitoring**
 - Token consumption ต่อวัน
@@ -256,25 +405,30 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 **4. Error Monitoring**
 - API timeout / Error rate
 - Workflow execution failures
+</div>
+</div>
 
 ---
 
 ## Logging Workflow
 
-### บันทึก Log ทุกการสนทนา
+<div class="columns">
+<div>
 
+### บันทึก Log ทุกการสนทนา
 ```
 หลัง AI Agent ตอบแล้ว:
       ↓
 [Code Node: สร้าง Log Record]
-  {
-    timestamp, user_id, question,
+  { timestamp, user_id, question,
     answer, tools_used, tokens,
-    execution_time, model
+    execution_time, model 
   }
       ↓
 [Google Sheets: Append Log]
 ```
+</div>
+<div>
 
 ### Escalation: เมื่อ Agent ตอบไม่ได้
 
@@ -283,12 +437,14 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
       ↓
 [Email / Line Notification: แจ้งเจ้าหน้าที่]
 ```
+</div>
+</div>
 
 ---
 
 <!-- _class: divider -->
 
-## 05
+## 06
 ## Roadmap & สรุปหลักสูตร
 
 ก้าวต่อไปสำหรับองค์กร
@@ -311,6 +467,8 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 ## Roadmap สำหรับหน่วยงาน
 
 ### แนะนำ Timeline การพัฒนา
+<div class="columns">
+<div>
 
 **เดือนที่ 1–2 (Quick Win)**
 - Deploy Agent FAQ ภายในหน่วยงาน
@@ -320,9 +478,14 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 - เพิ่ม Tools เชื่อมต่อฐานข้อมูลจริง
 - ขยาย Knowledge Base
 
+</div>
+<div>
+
 **เดือนที่ 5–6 (Production)**
 - เปิดให้บริการประชาชน
 - Monitor และปรับปรุงอย่างต่อเนื่อง
+</div>
+</div>
 
 ---
 
@@ -333,8 +496,8 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 | Day | Modules | ทักษะหลัก |
 |---|---|---|
 | **Day 1** | M1–M4 | Workflow Automation, n8n, Data Pipeline |
-| **Day 1** | M5–M7 | Sentiment Analysis, Encryption, Basic AI Agent |
-| **Day 2** | M8–M9 | Advanced AI Agent, RAG, Production Deploy |
+| **Day 1** | M5–M6 | Sentiment Analysis, Encryption |
+| **Day 2** | M7–M9 | Basic AI Agent,Advanced AI Agent, RAG, Production Deploy |
 
 ### ทักษะที่นำกลับไปใช้ได้ทันที
 - สร้าง Workflow ดึงข้อมูลอัตโนมัติ

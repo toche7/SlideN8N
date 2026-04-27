@@ -4,15 +4,15 @@
 
 OUTPUT="all-modules.md"
 MODULES=(
-  module-01-intro-ai-workflow.md
-  module-02-intro-n8n.md
-  module-03-workshop-basic-workflow.md
-  module-04-workshop-statistics-pipeline.md
-  module-05-workshop-sentiment-satisfaction.md
-  module-06-encryption-sensitive-data.md
-  # module-07-workshop-basic-ai-agent.md
-  # module-08-workshop-ai-agent-statistics.md
-  # module-09-workshop-ai-agent-realworld.md
+  # module-01-intro-ai-workflow.md
+  # module-02-intro-n8n.md
+  # module-03-workshop-basic-workflow.md
+  # module-04-workshop-statistics-pipeline.md
+  # module-05-workshop-sentiment-satisfaction.md
+  # module-06-encryption-sensitive-data.md
+  module-07-workshop-basic-ai-agent.md
+  module-08-workshop-ai-agent-statistics.md
+  module-09-workshop-ai-agent-realworld.md
 )
 
 cd "$(dirname "$0")"
