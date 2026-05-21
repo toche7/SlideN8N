@@ -3,7 +3,7 @@ marp: true
 theme: mahidol
 paginate: true
 size: 16:9
-footer: "n8n Workflow Automation | Module 1 — Introduction AI and Workflow Automation | สำนักงานสถิติแห่งชาติ"
+footer: "n8n Workflow Automation | Module 1 — Introduction to AI and Workflow Automation | สำนักงานสถิติแห่งชาติ"
 math: katex
 ---
 
@@ -19,7 +19,7 @@ math: katex
   <img src="fig/logos/nso.png" alt="BDI">
 </div>
 
-# Introduction AI and Workflow Automation
+# Introduction to AI and Workflow Automation
 
 <div class="subtitle">Module 1 — ภาพรวม Workflow Automation สำหรับงานสถิติภาครัฐ</div>
 
