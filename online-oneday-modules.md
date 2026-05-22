@@ -983,13 +983,13 @@ Parameter Value: (เลือกจาก Credentials)
 
 ### การใช้ Set Node
 
-**Demo 3: สร้างข้อมูลสรุปอย่างง่าย**
+**Demo 3 (option): สร้างข้อมูลสรุปอย่างง่าย**
 
 ```
 Field: report_title    → "รายงานสถิติประจำเดือน"
 Field: report_date     → {{ $today }}
-Field: data_source     → {{ $json.source }}
-Field: total_records   → {{ $json.count }}
+Field: province     →  "กรุงเทพมหานคร"
+Field: accident_count   →  30
 ```
 
 ![bg right:45% contain](fig/m3_Demo3.png)
@@ -999,10 +999,10 @@ Field: total_records   → {{ $json.count }}
 ## IF Node — เงื่อนไขการทำงาน
 
 
-**Demo 4: ตรวจสอบค่าผิดปกติ**
+**Demo 4 (option): ตรวจสอบค่าผิดปกติ**
 
 ```
-Condition: {{ $json.value }} > 1000000
+Condition: {{ $json.accident_count }} > 50
 ```
 **True Branch** → ส่งแจ้งเตือนว่าข้อมูลสูงผิดปกติ
 **False Branch** → ดำเนินการปกติต่อไป
@@ -1078,40 +1078,41 @@ return items.map(item => {
 <!-- _class: divider -->
 
 ## 05
-## Output: Email & File
+## Output: Email & File & Data Table
 
 ส่งออกผลลัพธ์
 
 ---
 
-## Send Mail
-### Demo 5: ส่งรายงานทาง Email
+## Send Gmail
+### Demo 5: ส่งรายงานทาง Gmail
 
 <div class="center">
 
-![w:700px](fig/m3_Demo5.png)
+![w:700px](fig/m3_Demo5_1.png)
 
 </div>
 
 ---
 
-## ส่งรายงานทาง Email
+## ส่งรายงานทาง Gmail
 
 <div class="columns">
 <div>
 
-### Send Email Node (SMTP)
+### Send Gmail Node 
 
 **การตั้งค่า Credential:**
-- Protocol: SMTP / Gmail / Outlook
-- Host, Port, Username, Password
+- Protocol: Gmail 
+- Authentication: OAuth2 ของ Gmail 
+  
 
 **Attachment:** แนบไฟล์ CSV/Excel ได้
 
 </div>
 <div>
 
-**การตั้งค่า Email Node:**
+**การตั้งค่า Gmail Node:**
 ```
 To:      director@nso.go.th
 Subject: รายงานสถิติ {{ $today }} อัตโนมัติ
@@ -1158,18 +1159,59 @@ Body:    ยอดรวมประจำวันนี้: {{ $json.total }}
 **การตั้งค่า Node:**
 ```
 Operation:    Append
-Document ID:  (วาง Google Sheet URL)
+Document Name:  customer
 Sheet Name:   Sheet1
 
-Columns:
-  date     → {{ $today }}
-  total    → {{ $json.total }}
-  province → {{ $json.province }}
+Data:
+  username → {{ $json.username }}
+  gender → {{ $json.gender }}
+  age → {{ $json.age }}
 ```
 
 </div>
 </div>
 
+---
+
+## Data Table
+### Demo 7: บันทึกข้อมูลลง Data Table ของ n8n
+
+<div class="center">
+
+![w:700px](fig/m3_Demo7.png)
+
+</div>
+
+---
+
+## บันทึกข้อมูลลง Data Table 
+
+<div class="columns">
+<div>
+
+### บันทึกข้อมูลลง Data Table
+**Data Table Node** — จัดเก็บข้อมูลภายใน n8n
+- ใช้เป็นฐานข้อมูลขนาดเล็ก
+- เก็บข้อมูลระหว่าง Workflow
+- เหมาะกับข้อมูลที่ต้องการความเร็วและไม่ซับซ้อน
+- ไม่เหมาะสำหรับข้อมูลขนาดใหญ่
+- สามารถใช้ร่วมกับ Workflow อื่นๆ ได้ผ่าน Data Table Node
+
+</div>
+<div>
+
+### ตัวอย่างการใช้งาน
+
+```
+Operation: Insert
+Table Name: customer
+Data:
+  username → {{ $json.username }}
+  gender → {{ $json.gender }}
+  age → {{ $json.age }}
+``` 
+</div>
+</div>
 
 ---
 
@@ -1195,7 +1237,7 @@ Columns:
 1. **ทำงานทุกเช้า** เวลา 07:00 น.
 2. **ดึงข้อมูลอากาศ** จาก Open-Meteo API (Free, ไม่ต้องใช้ API Key)
 3. **แปลงข้อมูล** — คำนวณค่าเฉลี่ยอุณหภูมิ
-4. **ส่ง Email** สรุปสภาพอากาศประจำวัน
+4. **ส่ง Gmail** สรุปสภาพอากาศประจำวัน
 
 </div>
 <div>
@@ -1220,7 +1262,7 @@ Parameters:
 
 <div class="center">
 
-![w:900px](fig/m3_ex1.png)
+![w:900px](fig/m3_ex1_1.png)
 
 </div>
 
@@ -1741,7 +1783,7 @@ URL:     https://catalog.nso.go.th/api/3/action/datastore_search
 
 <div class="center">
 
-![w:900px](fig/m4_Ex1.png)
+![w:900px](fig/m4_Ex1_1.png)
 
 </div>
 
@@ -1819,7 +1861,7 @@ GET https://catalog.nso.go.th/api/3/action/datastore_search
 
 <div class="center">
 
-![w:900px](fig/m4_Ex2.png)
+![w:900px](fig/m4_Ex2_1.png)
 
 </div>
 
