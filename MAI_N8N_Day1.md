@@ -18,8 +18,7 @@ math: katex
   <img src="fig/logos/mahidol.svg" alt="Mahidol University">
 </div>
 
-# Mini AI Agent Engineering
-
+# Workflow Automation with n8n
 <div class="subtitle">Module 1 — พื้นฐาน AI, Automation และ Agent Engineering</div>
 
 **หลักสูตร** Mini AI Agent Engineering — ออกแบบ สร้าง ทดสอบ และนำ AI Agent ไปใช้งานด้วย n8n
