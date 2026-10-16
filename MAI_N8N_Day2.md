@@ -1147,6 +1147,100 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 
 ---
 
+<!-- _class: divider -->
+
+## 04
+## Workshop:  Create Your Own Chat Interface
+
+
+
+---
+## Workshop: สร้าง Chat Interface ของหน่วยงาน
+
+- เราสามารถสร้าง Chat Interface ของหน่วยงานเองได้ โดยใช้ n8n Webhook + HTML/JS
+- เปลี่ยน Chat Trigger Node เป็น Webhook Trigger Node → เชื่อมต่อกับ AI Agent Node
+- สร้างหน้าเว็บ HTML/JS ที่ส่ง POST ไปยัง Webhook URL ของ n8n
+
+---
+## n8n Webhook 
+
+<div class="center">
+
+![w:1000px](fig/m9_web_1.png)
+
+</div>
+
+
+---
+## HTML/JS Chat Interface
+
+<div class="center">
+
+![w:500px](fig/m9_web_2.png)
+
+</div>
+
+- Demo WebChat: https://github.com/toche7/WebChat
+
+
+---
+## การกำหนดค่า Authentication แบบ None
+
+<div class="center">
+
+![w:400px](fig/m9_web_3.png)
+
+</div>
+
+
+---
+## การกำหนดค่า Authentication แบบ Header Auth
+
+
+<div class="center">
+
+![w:400px](fig/m9_web_4.png)
+
+</div>
+
+---
+## การกำหนดค่า Authentication แบบ Header Auth
+
+
+<div class="center">
+
+![w:800px](fig/m9_web_5.png)
+
+</div>
+
+---
+## การกำหนดค่า Setting ของ Chat Interface
+
+
+<div class="center">
+
+![w:700px](fig/m9_web_6.png)
+
+</div>
+
+
+
+
+
+
+
+
+---
+
+<!-- _class: divider -->
+
+## 03
+## Workshop: Deploy on Line OA
+
+เชื่อมต่อ AI Agent กับ Line Official Account
+
+---
+
 ## Deploy ผ่าน Line OA
 
 ### โครงสร้าง Line Bot + n8n Agent
@@ -1180,18 +1274,6 @@ CBTU · คณะวิศวกรรมศาสตร์ · มหาวิ�
 ![w:900px](fig/m9_LineDiagram.png)
 
 </div>
-
-
-
-
----
-
-<!-- _class: divider -->
-
-## 03
-## Workshop: Deploy on Line OA
-
-เชื่อมต่อ AI Agent กับ Line Official Account
 
 ---
 
